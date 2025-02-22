@@ -9,7 +9,7 @@ import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
-TOKEN_FILE = "token.json"
+TOKEN_FILE = "../../microservicios/token.json"
 
 
 def get_token():
@@ -90,8 +90,8 @@ def get_products(query, access_token, brand="", perPage=5):
     query_params = {"query": query}
     if brand:
         query_params["brand"] = brand
-    if perPage != 5:
-        query_params["perPage"] = perPage
+
+    query_params["perPage"] = perPage
 
     encoded_query = urllib.parse.urlencode(query_params)
     print(encoded_query)
@@ -174,4 +174,4 @@ def getProducts_multiplePrompts():
 
 if __name__ == '__main__':
     # app.run(debug=True, port=5002)
-    print(get_products("Zapatos azules", get_token(),perPage=4))
+    print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
