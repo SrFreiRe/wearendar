@@ -16,6 +16,9 @@ from PIL import Image
 def configure_drivers():
     # Configurar Selenium con ChromeDriver
     chrome_options = Options()
+
+    chrome_options.add_argument("--window-position=-10000,-10000")  # Mueve la ventana fuera de la pantalla
+
     chrome_options.add_argument("--no-sandbox")  # Evitar errores de permisos
     chrome_options.add_argument("--disable-dev-shm-usage")  # Evitar errores de memoria
     chrome_options.add_argument("--disable-gpu")  # Deshabilitar la aceleración de hardware
