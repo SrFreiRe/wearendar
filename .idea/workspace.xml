@@ -10,7 +10,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62fd5dca-e39f-4861-abb5-07f4ca30b68e" name="Changes" comment="Mejorado el web scrapping con mejora en detección de prendas">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/servers/ITX APIs Server/imageGetter.py" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/imageGetter.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -262,7 +261,7 @@
       <workItem from="1740193270496" duration="21161000" />
       <workItem from="1740222859978" duration="950000" />
       <workItem from="1740244274262" duration="687000" />
-      <workItem from="1740246823622" duration="1059000" />
+      <workItem from="1740246823622" duration="1535000" />
     </task>
     <task id="LOCAL-00001" summary="Conexión con la API de InditexTech a través de las funciones de textToPrenda.py&#10;&#10;Siguente:&#10;Exportar como servidor en flask.">
       <option name="closed" value="true" />
@@ -368,7 +367,23 @@
       <option name="project" value="LOCAL" />
       <updated>1740222902929</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Mejorado el web scrapping con mejora en detección de prendas">
+      <option name="closed" value="true" />
+      <created>1740247906403</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1740247906403</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Mejorado el web scrapping con mejora en detección de prendas">
+      <option name="closed" value="true" />
+      <created>1740248080272</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1740248080272</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -393,7 +408,8 @@
     <MESSAGE value="Previo a cambio de función de búsqueda a producción&#10;&#10;Siguente:&#10;Mover a servidor de producción en vez de BD" />
     <MESSAGE value="Cambio completo a producción.&#10;&#10;Siguente: &#10;cambiar para generar un token solo cuando el anterior está expirado." />
     <MESSAGE value="Foto a prendas en producción" />
-    <option name="LAST_COMMIT_MESSAGE" value="Foto a prendas en producción" />
+    <MESSAGE value="Mejorado el web scrapping con mejora en detección de prendas" />
+    <option name="LAST_COMMIT_MESSAGE" value="Mejorado el web scrapping con mejora en detección de prendas" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/wearendar$Postman3.coverage" NAME="Postman3 Coverage Results" MODIFIED="1740206217695" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
@@ -401,7 +417,7 @@
     <SUITE FILE_PATH="coverage/wearendar$postman.coverage" NAME="postman Coverage Results" MODIFIED="1740206581421" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
     <SUITE FILE_PATH="coverage/wearendarGit$imageGetter.coverage" NAME="imageGetter Coverage Results" MODIFIED="1740241871624" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/ITX APIs Server" />
     <SUITE FILE_PATH="coverage/wearendarGit$textToPrenda.coverage" NAME="textToPrenda Coverage Results" MODIFIED="1740233414139" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
-    <SUITE FILE_PATH="coverage/Wearendar$imageGetter.coverage" NAME="imageGetter Coverage Results" MODIFIED="1740247836691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/ITX APIs Server" />
+    <SUITE FILE_PATH="coverage/Wearendar$imageGetter.coverage" NAME="imageGetter Coverage Results" MODIFIED="1740248060010" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/ITX APIs Server" />
     <SUITE FILE_PATH="coverage/wearendar$postman2.coverage" NAME="postman2 Coverage Results" MODIFIED="1740201760056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
     <SUITE FILE_PATH="coverage/wearendar$fotoToPrenda.coverage" NAME="fotoToPrenda Coverage Results" MODIFIED="1740222490792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/ITX APIs Server" />
     <SUITE FILE_PATH="coverage/wearendar$textToPrenda.coverage" NAME="textToPrenda Coverage Results" MODIFIED="1740223659590" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />

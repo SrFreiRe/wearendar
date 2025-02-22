@@ -58,6 +58,7 @@ def store_format(driver, store):
         max_scroll = driver.execute_script("return document.body.scrollHeight")
         do_scroll(driver, 1750, max_scroll)
 
+        # Se detecta el patron de las imágenes de Zara
         img_elements = driver.find_elements(By.XPATH, '//img[contains(@alt, "Image") or contains(@alt, "Imagen")]')
         img_urls = [img.get_attribute('src') for img in img_elements]
         print(f"Imágenes encontradas: {img_urls}")
@@ -65,12 +66,14 @@ def store_format(driver, store):
 
     elif store == "massimo_dutti":
         wait = WebDriverWait(driver, 10)
+        # Se espera a que aparezca el contenedor de las imágenes, Massimo Dutti tiene un scroll interno
         container = wait.until(EC.presence_of_element_located(
             (By.CLASS_NAME, 'cc-imagen-collection')
         ))
         max_scroll = driver.execute_script("return arguments[0].scrollHeight", container)
         do_scroll(driver, 1750, max_scroll, container)
 
+        # Se detecta el patron de las imágenes de Massimo Dutti
         num_range = range(1, 9)  # De 1 a 8
         xpath_query = f'//img[({" or ".join([f"@imageindex='{i}'" for i in num_range])})]'
         img_elements = driver.find_elements(By.XPATH, xpath_query)
@@ -82,12 +85,14 @@ def store_format(driver, store):
 
     elif store == "lefties":
         wait = WebDriverWait(driver, 10)
+        # Se espera a que aparezca el contenedor de las imágenes, lefties tiene un scroll interno
         container = wait.until(EC.presence_of_element_located(
             (By.CLASS_NAME, 'lft-product-images')
         ))
         max_scroll = driver.execute_script("return arguments[0].scrollHeight", container)
         do_scroll(driver, 1750, max_scroll, container)
 
+        # Se detecta el patron de las imágenes de Lefties
         img_elements = driver.find_elements(By.XPATH, '//img[@loading="lazy"]')
         img_urls = [img.get_attribute('src') for img in img_elements]
         print(f"Imágenes encontradas: {img_urls}")
@@ -97,6 +102,7 @@ def store_format(driver, store):
         max_scroll = driver.execute_script("return document.body.scrollHeight")
         do_scroll(driver, 1750, max_scroll)
 
+        # Se detecta el patron de las imágenes de Bershka, su clase
         img_elements = driver.find_elements(By.CLASS_NAME, 'image-item')
 
         # Filtra los elementos que tienen el atributo alt que contiene "5" o "6"
@@ -112,6 +118,7 @@ def store_format(driver, store):
         max_scroll = driver.execute_script("return document.body.scrollHeight")
         do_scroll(driver, 1000, max_scroll)
 
+        # Se detecta el patron de las imágenes de Stradivarius
         img_elements = driver.find_elements(By.XPATH, '//img[contains(@data-cy, "horizontal-image")]')
 
         img_urls = [img.get_attribute('src') for img in img_elements]
@@ -131,7 +138,8 @@ def get_image_url(url_producto, tienda):
         # Llamamos a la función para obtener la imagen, la metodologia consistirá en hacer scroll en la página para cargar todas las imágenes, ya que estas se cargan de forma dinámica
         img_element = store_format(driver, tienda)
 
-        # Filtrar imágenes que no sean de modelos
+        # Filtrar imágenes que no sean de modelos, es decir, queremos aquellas que son solo la prenda
+        # Utilizamos para ello un algoritmo para detectar aquella foto con menor porcentaje de color piel
         best_url = lowest_skin_percentage(img_element,tienda)
         print(f"Mejor URL encontrada: {best_url}")
         # Descargar la imagen desde la URL
@@ -141,9 +149,11 @@ def get_image_url(url_producto, tienda):
         print("Ocurrió un error:", e)
         return None
 
+# Función para obtener la imagen con menor porcentaje de piel de la url
 def lowest_skin_percentage(img_urls,tienda):
     result_url = None
     result_skin = 100
+    # Iterar sobre las URLs de las imágenes
     for img_url in img_urls:
         skin_percentage = is_model_image(img_url,tienda)
         if skin_percentage + 2 < result_skin:
@@ -151,8 +161,10 @@ def lowest_skin_percentage(img_urls,tienda):
             result_url = img_url
     return result_url
 
+# Función para determinar si una imagen es de un modelo o de una prenda
 def is_model_image(img_url, tienda):
     try:
+        # Headers para evitar bloqueos por parte del servidor
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Referer": "https://www."+tienda+".com/",
@@ -176,7 +188,7 @@ def is_model_image(img_url, tienda):
         total_pixels = img_array.shape[0] * img_array.shape[1]
         skin_percentage = (skin_pixels / total_pixels) * 100
 
-        # Determinar si es un modelo según el umbral de piel detectada
+        # Determinar el porcentaje de piel en la imagen
         return skin_percentage
 
     except Exception as e:
