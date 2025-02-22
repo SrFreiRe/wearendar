@@ -72,6 +72,28 @@ def obtener_imagen_inditex(driver, tienda):
             (By.XPATH, '//img[@imageindex="4"]')
         ))
 
+    elif tienda == "lefties":
+        wait = WebDriverWait(driver, 10)
+        contenedor_imagenes = wait.until(EC.presence_of_element_located(
+            (By.CLASS_NAME, 'lft-product-images')
+        ))
+        max_scroll = driver.execute_script("return arguments[0].scrollHeight", contenedor_imagenes)
+        hacer_scroll(driver, 1750, max_scroll, contenedor_imagenes)
+
+        wait = WebDriverWait(driver, 10)
+        img_element = wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//img[@loading="lazy"]')
+        ))
+
+    elif tienda == "pullandbear":
+        max_scroll = driver.execute_script("return document.body.scrollHeight")
+        hacer_scroll(driver, 1750, max_scroll)
+
+        wait = WebDriverWait(driver, 10)
+        img_element = wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//img[contains(@alt, "4")]')
+        ))
+
 
     elif tienda == "bershka":
         max_scroll = driver.execute_script("return document.body.scrollHeight")
@@ -91,6 +113,8 @@ def obtener_imagen_inditex(driver, tienda):
         img_element = wait.until(EC.presence_of_element_located(
             (By.XPATH, '//img[@data-cy="horizontal-image-6"]')
         ))
+
+
 
     return img_element  # Devolver el elemento de la imagen
 
@@ -118,5 +142,5 @@ def descargar_imagen_zara(url_producto, tienda):
 
 
 # Ejemplo de uso
-url_producto = "https://www.zara.com/es/en/limited-edition-jacquard-cardigan-p07140405.html?v1=418123741"
-descargar_imagen_zara(url_producto, "zara")
+url_producto = "https://www.lefties.com/es/mujer/novedades/jeans-culotte-el%C3%A1stico-c1030267503p659622175.html?colorId=428&parentId=659626182#fromrecommendation"
+descargar_imagen_zara(url_producto, "lefties")
