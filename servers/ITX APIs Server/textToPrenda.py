@@ -3,6 +3,9 @@ import base64
 import json
 import time
 import os
+import urllib.parse
+
+import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
@@ -70,24 +73,34 @@ def get_token():
         return None
 
 
-import urllib.parse
+def normalize_text(text):
+    text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('utf-8')
+    return text.replace("ñ", "n")  # Sustituye la ñ manualmente
 
-def get_products(query, access_token):
+def get_products(query, access_token, brand="", perPage=5):
     conn = http.client.HTTPSConnection("api.inditex.com")
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
     }
 
-    encoded_query = urllib.parse.quote(query)  # Codifica correctamente los caracteres especiales en la URL
-    endpoint = f"/searchpmpa/products?query={encoded_query}"
+    query = normalize_text(query)
+
+    query_params = {"query": query}
+    if brand:
+        query_params["brand"] = brand
+
+    query_params["perPage"] = perPage
+
+    encoded_query = urllib.parse.urlencode(query_params)
+    print(encoded_query)
+    endpoint = f"/searchpmpa/products?{encoded_query}"
 
     conn.request("GET", endpoint, headers=headers)
     res = conn.getresponse()
     data = res.read()
 
     return json.loads(data.decode("utf-8"))
-
 
 
 app = Flask(__name__)
@@ -97,48 +110,48 @@ swagger = Swagger(app)
 @app.route('/generate_outfit', methods=['POST'])
 def getProducts_multiplePrompts():
     """
-  Genera una lista de productos basada en los outfits generados.
-  ---
-  tags:
-    - Outfits
-  parameters:
-    - name: clothes
-      in: body
-      required: true
-      schema:
-        type: object
-        properties:
-          outfit:
-            type: array
-            items:
-              type: string
-              example: "Camisa de botones blanca"
-  responses:
-    200:
-      description: JSON con los productos recomendados para cada prenda
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties:
+    Genera una lista de productos basada en los outfits generados.
+    ---
+    tags:
+      - Outfits
+    parameters:
+      - name: clothes
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            outfit:
               type: array
               items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "Camisa de lino blanca"
-                  price:
-                    type: number
-                    example: 39.99
-                  link:
-                    type: string
-                    example: "https://ejemplo.com/camisa-blanca"
-    400:
-      description: Error en los datos enviados
-    500:
-      description: Error interno del servidor
-  """
+                type: string
+                example: "Camisa de botones blanca"
+    responses:
+      200:
+        description: JSON con los productos recomendados para cada prenda
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "Camisa de lino blanca"
+                    price:
+                      type: number
+                      example: 39.99
+                    link:
+                      type: string
+                      example: "https://ejemplo.com/camisa-blanca"
+      400:
+        description: Error en los datos enviados
+      500:
+        description: Error interno del servidor
+    """
     token = get_token()
     if not token:
         return jsonify({"error": "No se pudo obtener el token"}), 500
@@ -161,3 +174,4 @@ def getProducts_multiplePrompts():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
+    # print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
