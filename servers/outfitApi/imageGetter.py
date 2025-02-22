@@ -56,7 +56,7 @@ def obtener_imagen_inditex(driver, tienda):
         # Esperar hasta que la imagen con alt="Image 5" o "Imagen 4" esté presente en el DOM, esta es la imagen limpia del producto
         wait = WebDriverWait(driver, 10)
         img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[contains(@alt, "Image 5") or contains(@alt, "Imagen 4")]')
+            (By.XPATH, '//img[contains(@alt, "Image 4") or contains(@alt, "Imagen 4")]')
         ))
 
     elif tienda == "massimodutti":
@@ -70,6 +70,28 @@ def obtener_imagen_inditex(driver, tienda):
         wait = WebDriverWait(driver, 10)
         img_element = wait.until(EC.presence_of_element_located(
             (By.XPATH, '//img[@imageindex="4"]')
+        ))
+
+    elif tienda == "lefties":
+        wait = WebDriverWait(driver, 10)
+        contenedor_imagenes = wait.until(EC.presence_of_element_located(
+            (By.CLASS_NAME, 'lft-product-images')
+        ))
+        max_scroll = driver.execute_script("return arguments[0].scrollHeight", contenedor_imagenes)
+        hacer_scroll(driver, 1750, max_scroll, contenedor_imagenes)
+
+        wait = WebDriverWait(driver, 10)
+        img_element = wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//img[@loading="lazy"]')
+        ))
+
+    elif tienda == "pullandbear":
+        max_scroll = driver.execute_script("return document.body.scrollHeight")
+        hacer_scroll(driver, 1750, max_scroll)
+
+        wait = WebDriverWait(driver, 10)
+        img_element = wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//img[contains(@alt, "4")]')
         ))
 
 
@@ -92,6 +114,8 @@ def obtener_imagen_inditex(driver, tienda):
             (By.XPATH, '//img[@data-cy="horizontal-image-6"]')
         ))
 
+
+
     return img_element  # Devolver el elemento de la imagen
 
 
@@ -108,7 +132,7 @@ def descargar_imagen_zara(url_producto, tienda):
 
         # Obtener la URL de la imagen
         img_url = img_element.get_attribute('src')
-        return img_url
+        print(img_url)
 
     except Exception as e:
         print("Ocurrió un error:", e)
@@ -118,5 +142,5 @@ def descargar_imagen_zara(url_producto, tienda):
 
 
 # Ejemplo de uso
-url_producto = "https://www.massimodutti.com/es/pantalon-parachute-piel-ante-l05304914?pelement=47370412"
-descargar_imagen_zara(url_producto, "massimodutti")
+url_producto = "https://www.lefties.com/es/mujer/novedades/jeans-culotte-el%C3%A1stico-c1030267503p659622175.html?colorId=428&parentId=659626182#fromrecommendation"
+descargar_imagen_zara(url_producto, "lefties")
