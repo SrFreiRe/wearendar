@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +35,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -73,7 +76,6 @@ import ochat.wearendar.ui.theme.MontserratFontFamily
 import ochat.wearendar.ui.theme.WearendarTheme
 import ochat.wearendar.utils.eventMap
 import ochat.wearendar.utils.formatDate
-import ochat.wearendar.utils.wears
 import ochat.wearendar.utils.wearsList
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -708,213 +710,82 @@ fun FrontSideContent(event: Event){
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 16.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 🔹 First Row (70% of the height) with 2 columns
+        // 🔹 First Row (80% of height) - Contains 2 Columns (Each with 2 Vertical Pagers)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.8f),
+                .weight(0.8f)
+                .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 🔹 First Column (2 VerticalPagers inside)
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
+                val pagerState1 = rememberPagerState { wears[0].size }
+                val pagerState2 = rememberPagerState { wears[1].size }
+
+                VerticalPager(
+                    state = pagerState1,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.5f)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                    ) {
-                        val wear = wears[0][0]
-                        Image(
-                            painter = painterResource(id = wear.img), // Replace with actual drawable
-                            contentDescription = wear.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.65f)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Image(
-                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
-                            contentDescription = wear.brand.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.25f)
-                        )
-
-                        Text(
-                            text = "23.50$",
-                            fontSize = 20.sp,
-                            fontFamily = MontserratFontFamily,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.10f) // 10% Height
-                                .wrapContentHeight(Alignment.CenterVertically)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
-                    }
+                        .weight(1f)
+                ) { page ->
+                    WearItemView(wear = wears[0][page])
                 }
 
-                Row(
+                VerticalPager(
+                    state = pagerState2,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.5f)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                    ) {
-                        val wear = wears[1][0]
-                        Image(
-                            painter = painterResource(id = wear.img), // Replace with actual drawable
-                            contentDescription = wear.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.65f)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Image(
-                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
-                            contentDescription = wear.brand.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.25f)
-                        )
-
-                        Text(
-                            text = "23.50$",
-                            fontSize = 20.sp,
-                            fontFamily = MontserratFontFamily,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.10f) // 10% Height
-                                .wrapContentHeight(Alignment.CenterVertically)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
-                    }
+                        .weight(1f)
+                ) { page ->
+                    WearItemView(wear = wears[1][page])
                 }
             }
 
-
+            // 🔹 Second Column (2 VerticalPagers inside)
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
+                val pagerState3 = rememberPagerState { wears[2].size }
+                val pagerState4 = rememberPagerState { wears[3].size }
+
+                VerticalPager(
+                    state = pagerState3,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.5f)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                    ) {
-                        val wear = wears[2][0]
-                        Image(
-                            painter = painterResource(id = wear.img), // Replace with actual drawable
-                            contentDescription = wear.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.65f),
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Image(
-                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
-                            contentDescription = wear.brand.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.25f)
-                        )
-
-                        Text(
-                            text = "23.50$",
-                            fontSize = 20.sp,
-                            fontFamily = MontserratFontFamily,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.10f) // 10% Height
-                                .wrapContentHeight(Alignment.CenterVertically)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
-                    }
+                        .weight(1f)
+                ) { page ->
+                    WearItemView(wear = wears[2][page])
                 }
 
-                Row(
+                VerticalPager(
+                    state = pagerState4,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(0.5f)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                    ) {
-                        val wear = wears[3][0]
-                        Image(
-                            painter = painterResource(id = wear.img), // Replace with actual drawable
-                            contentDescription = wear.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.65f)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Image(
-                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
-                            contentDescription = wear.brand.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.25f)
-                        )
-
-                        Text(
-                            text = "23.50$",
-                            fontSize = 20.sp,
-                            fontFamily = MontserratFontFamily,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.10f)
-                                .wrapContentHeight(Alignment.CenterVertically)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
-                    }
+                        .weight(1f)
+                ) { page ->
+                    WearItemView(wear = wears[3][page])
                 }
             }
         }
 
-        // 🔹 Second Row (30% of the height)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -962,9 +833,47 @@ fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
                         fontFamily = MontserratFontFamily,
                     )
                 }
-
             }
         }
+    }
+}
+
+@Composable
+fun WearItemView(wear: Wear, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = wear.img),
+            contentDescription = wear.name,
+            modifier = Modifier
+                .weight(0.8f)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Image(
+            painter = painterResource(id = wear.brand.drawable),
+            contentDescription = wear.brand.name,
+            modifier = Modifier
+                .weight(0.3f)
+        )
+
+        Text(
+            text = "${wear.price}€",
+            fontSize = 20.sp,
+            fontFamily = MontserratFontFamily,
+            color = Color.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(Alignment.CenterVertically)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .weight(0.2f)
+        )
     }
 }
 

@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.coil.compose)
     implementation(libs.wajahatkarim.flippable)
+    implementation(libs.accompanist.pager)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
