@@ -57,13 +57,13 @@ def store_format(driver, store):
     if store == "zara":
         max_scroll = driver.execute_script("return document.body.scrollHeight")
         do_scroll(driver, 1750, max_scroll)
-        # Esperar hasta que la imagen con alt="Image 5" o "Imagen 4" esté presente en el DOM, esta es la imagen limpia del producto
-        wait = WebDriverWait(driver, 10)
-        img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[contains(@alt, "Image 4") or contains(@alt, "Imagen 4")]')
-        ))
 
-    elif store == "massimodutti":
+        img_elements = driver.find_elements(By.XPATH, '//img[contains(@alt, "Image") or contains(@alt, "Imagen")]')
+        img_urls = [img.get_attribute('src') for img in img_elements]
+        print(f"Imágenes encontradas: {img_urls}")
+        return img_urls
+
+    elif store == "massimo_dutti":
         wait = WebDriverWait(driver, 10)
         container = wait.until(EC.presence_of_element_located(
             (By.CLASS_NAME, 'cc-imagen-collection')
@@ -71,10 +71,14 @@ def store_format(driver, store):
         max_scroll = driver.execute_script("return arguments[0].scrollHeight", container)
         do_scroll(driver, 1750, max_scroll, container)
 
-        wait = WebDriverWait(driver, 10)
-        img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[@imageindex="4"]')
-        ))
+        num_range = range(1, 9)  # De 1 a 8
+        xpath_query = f'//img[({" or ".join([f"@imageindex='{i}'" for i in num_range])})]'
+        img_elements = driver.find_elements(By.XPATH, xpath_query)
+
+        img_urls = [img.get_attribute('src') for img in img_elements]
+        print(f"Imágenes encontradas: {img_urls}")
+        return img_urls
+
 
     elif store == "lefties":
         wait = WebDriverWait(driver, 10)
@@ -84,42 +88,53 @@ def store_format(driver, store):
         max_scroll = driver.execute_script("return arguments[0].scrollHeight", container)
         do_scroll(driver, 1750, max_scroll, container)
 
-        wait = WebDriverWait(driver, 10)
-        img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[@loading="lazy"]')
-        ))
-
-    elif store == "pullandbear":
-        max_scroll = driver.execute_script("return document.body.scrollHeight")
-        do_scroll(driver, 1750, max_scroll)
-
-        wait = WebDriverWait(driver, 10)
-        img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[contains(@alt, "4")]')
-        ))
-
+        img_elements = driver.find_elements(By.XPATH, '//img[@loading="lazy"]')
+        img_urls = [img.get_attribute('src') for img in img_elements]
+        print(f"Imágenes encontradas: {img_urls}")
+        return img_urls
 
     elif store == "bershka":
         max_scroll = driver.execute_script("return document.body.scrollHeight")
         do_scroll(driver, 1750, max_scroll)
 
-        wait = WebDriverWait(driver, 10)
-        img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[contains(@alt, "4")]')
-        ))
+        img_elements = driver.find_elements(By.CLASS_NAME, 'image-item')
+        img_urls = [img.get_attribute('src') for img in img_elements]
+        print(f"Imágenes encontradas: {img_urls}")
+        return img_urls
+
 
     elif store == "stradivarius":
         time.sleep(0.5)  # Stradiarius carga las imágenes de forma más lenta
         max_scroll = driver.execute_script("return document.body.scrollHeight")
-        do_scroll(driver, 600, max_scroll)
-        # Esperar hasta que la imagen con alt="Image 5" o "Imagen 4" esté presente en el DOM, esta es la imagen limpia del producto
-        wait = WebDriverWait(driver, 10)
-        img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[@data-cy="horizontal-image-6"]')
-        ))
+        do_scroll(driver, 1000, max_scroll)
 
+        img_elements = driver.find_elements(By.XPATH, '//img[contains(@data-cy, "horizontal-image")]')
+
+        img_urls = [img.get_attribute('src') for img in img_elements]
+        print(f"Imágenes encontradas: {img_urls}")
+        return img_urls
 
     return img_element  # Devolver el elemento de la imagen
+
+def download_image(url, tienda):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://www."+tienda+".com/",
+        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+    }
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Verificar que la descarga fue exitosa
+
+    # Convertir la imagen a formato PNG si no lo está
+    img = Image.open(BytesIO(response.content))
+    if img.format != "PNG":
+        img = img.convert("RGB")  # Convertir a RGB si es necesario
+        png_buffer = BytesIO()
+        img.save(png_buffer, format="PNG")
+        png_buffer.seek(0)  # Rebobinar el buffer para leerlo desde el principio
+        return png_buffer
+    else:
+        return BytesIO(response.content)
 
 
 # Función principal que devuelve la URL de la imagen de un producto de Zara
@@ -133,47 +148,57 @@ def get_image_url(url_producto, tienda):
         # Llamamos a la función para obtener la imagen, la metodologia consistirá en hacer scroll en la página para cargar todas las imágenes, ya que estas se cargan de forma dinámica
         img_element = store_format(driver, tienda)
 
-        # Obtener la URL de la imagen
-        img_url = img_element.get_attribute('src')
-        return img_url
+        # Filtrar imágenes que no sean de modelos
+        best_url = lowest_skin_percentage(img_element,tienda)
+
+        # Descargar la imagen desde la URL
+        img = download_image(best_url,tienda)
+        return img
 
     except Exception as e:
         print("Ocurrió un error:", e)
         return None
-    finally:
-        driver.quit()
 
+def lowest_skin_percentage(img_urls,tienda):
+    result_url = None
+    result_skin = 100
+    for img_url in img_urls:
+        skin_percentage = is_model_image(img_url,tienda)
+        if skin_percentage < result_skin:
+            result_skin = skin_percentage
+            result_url = img_url
+    return result_url
 
-def is_model_image(img_url, white_threshold=240, percentage_threshold=50, top_fraction=0.3):
+def is_model_image(img_url, tienda):
     try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Referer": "https://www."+tienda+".com/",
+            "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+        }
         # Descargar la imagen desde la URL
-        response = requests.get(img_url)
+        response = requests.get(img_url, headers=headers)
         response.raise_for_status()
         img_array = np.array(Image.open(BytesIO(response.content)))
 
-        # Convertir a escala de grises
-        gray_img = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+        # Convertir a espacio de color HSV
+        hsv_img = cv2.cvtColor(img_array, cv2.COLOR_RGB2HSV)
 
-        # Determinar la región superior a analizar
-        height = gray_img.shape[0]
-        top_height = int(height * top_fraction)
-        top_region = gray_img[:top_height, :]
+        # Definir rango de colores de piel en HSV
+        lower_skin = np.array([0, 40, 50], dtype=np.uint8)  # Rango bajo
+        upper_skin = np.array([35, 255, 255], dtype=np.uint8)  # Rango alto
+        skin_mask = cv2.inRange(hsv_img, lower_skin, upper_skin)
 
-        # Contar píxeles "blancos" (o muy claros)
-        white_pixels = np.sum(top_region > white_threshold)
-        total_pixels = top_region.size
-        white_percentage = (white_pixels / total_pixels) * 100
+        # Calcular porcentaje de piel en la imagen
+        skin_pixels = np.sum(skin_mask > 0)
+        total_pixels = img_array.shape[0] * img_array.shape[1]
+        skin_percentage = (skin_pixels / total_pixels) * 100
 
-        print(f"Porcentaje de píxeles blancos en la parte superior: {white_percentage:.2f}%")
-
-        return white_percentage > percentage_threshold
+        # Determinar si es un modelo según el umbral de piel detectada
+        return skin_percentage
 
     except Exception as e:
-        print(f"Error al procesar la imagen: {e}")
-        return None
+        print("Error al analizar la imagen:", e)
+        return False
 
-# Ejemplo de uso
-url_producto = "https://www.lefties.com/es/mujer/novedades/jeans-culotte-el%C3%A1stico-c1030267503p659622175.html?colorId=428&parentId=659626182#fromrecommendation"
-img_url= get_image_url(url_producto, 'lefties')
-is_model = is_model_image(img_url)
-print(f"URL de la imagen: {get_image_url(url_producto, 'lefties')}")
+
