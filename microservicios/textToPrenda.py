@@ -1,7 +1,8 @@
 import http.client
 import base64
 import json
-
+from flask import Flask, request, jsonify
+from flasgger import Swagger
 
 
 
@@ -57,79 +58,116 @@ def get_token():
 
 
 
-# Prueba la función
-if __name__ == "__main__":
-  token_data = get_token()
-  print("Token obtenido:", token_data)
 
+def get_products(query, access_token):
+  """Realiza una petición GET a la API de Inditex para buscar productos."""
+  HOST = "api-sandbox.inditex.com"
+  PORT = 443
+  SEARCH_ENDPOINT = "/searchpmpa-sandbox/products"
+  """
+  Realiza una petición GET a la API de Inditex para buscar productos.
 
-  def get_products(query, access_token):
-    """Realiza una petición GET a la API de Inditex para buscar productos."""
-    HOST = "api-sandbox.inditex.com"
-    PORT = 443
-    SEARCH_ENDPOINT = "/searchpmpa-sandbox/products"
-    """
-    Realiza una petición GET a la API de Inditex para buscar productos.
+  :param query: Término de búsqueda (ejemplo: "shirt")
+  :param access_token: Token de acceso OAuth2 válido
+  :return: Diccionario con los resultados de la API o None si hay error.
+  """
+  try:
+    # Configurar la conexión HTTPS
+    conn = http.client.HTTPSConnection(HOST, PORT)
 
-    :param query: Término de búsqueda (ejemplo: "shirt")
-    :param access_token: Token de acceso OAuth2 válido
-    :return: Diccionario con los resultados de la API o None si hay error.
-    """
-    try:
-      # Configurar la conexión HTTPS
-      conn = http.client.HTTPSConnection(HOST, PORT)
+    # Configurar headers con el token de acceso
+    headers = {
+      "Authorization": f"Bearer {access_token}",
+      "Content-Type": "application/json"
+    }
 
-      # Configurar headers con el token de acceso
-      headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-      }
+    # Hacer la petición con el query
+    endpoint = f"{SEARCH_ENDPOINT}?query={query}"
+    conn.request("GET", endpoint, "", headers)
 
-      # Hacer la petición con el query
-      endpoint = f"{SEARCH_ENDPOINT}?query={query}"
-      conn.request("GET", endpoint, "", headers)
+    # Obtener la respuesta
+    res = conn.getresponse()
+    data = res.read().decode("utf-8")
 
-      # Obtener la respuesta
-      res = conn.getresponse()
-      data = res.read().decode("utf-8")
+    # Imprimir detalles para depuración
+    print(f"HTTP Status: {res.status}")
+    print(f"Response: {data}")
 
-      # Imprimir detalles para depuración
-      print(f"HTTP Status: {res.status}")
-      print(f"Response: {data}")
-
-      # Convertir la respuesta a diccionario
-      if res.status == 200:
-        return json.loads(data)
-      else:
-        print("Error en la solicitud de productos.")
-        return None
-
-    except Exception as e:
-      print(f"Error en get_products(): {e}")
+    # Convertir la respuesta a diccionario
+    if res.status == 200:
+      return json.loads(data)
+    else:
+      print("Error en la solicitud de productos.")
       return None
 
+  except Exception as e:
+    print(f"Error en get_products(): {e}")
+    return None
 
-
-def getProducts_multiplePrompts(query):
+@app.route('/generate_outfit', methods=['POST'])
+def getProducts_multiplePrompts():
+    """
+      Genera una lista de productos basada en los outfits generados.
+      ---
+      tags:
+        - Outfits
+      parameters:
+        - name: clothes
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              outfit:
+                type: array
+                items:
+                  type: string
+                  example: "Camisa de botones blanca"
+      responses:
+        200:
+          description: JSON con los productos recomendados para cada prenda
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "Camisa de lino blanca"
+                      price:
+                        type: number
+                        example: 39.99
+                      link:
+                        type: string
+                        example: "https://ejemplo.com/camisa-blanca"
+        400:
+          description: Error en los datos enviados
+        500:
+          description: Error interno del servidor
+      """
     token = get_token().get("id_token")
 
+    print(token)
+
     #Generación de una lista de "prompts" a partir de json
-
-
-    listaPrompts = []
+    clothes = request.get_json()
+    listaPrompts = clothes.get("outfit", [])
 
     #Generar un json de outfits
 
+    #Declaramos un json vacío
+    data = {}
+
     for i in listaPrompts:
       productos = get_products(i, token)
-      if productos:
-        with open("productos.json", "r+") as file:
-          data = json.load(file)
-          data[i] = productos
-          file.seek(0)
-          json.dump(data, file, indent=4)
+      #Añadimos productos a un Yeison, con la i como key (para agruparlos)
+      data[i] = productos
+    return data
 
-
-
-
+if __name__ == '__main__':
+  app.run(debug=True, port=5001)
 
