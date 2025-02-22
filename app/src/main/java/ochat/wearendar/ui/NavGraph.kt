@@ -25,7 +25,7 @@ import ochat.wearendar.ui.screens.WishListScreen
 @Composable
 fun NavGraph() {
     val screens = listOf(Screen.WishList, Screen.Calendar, Screen.Camera)
-    val pagerState = rememberPagerState(pageCount = { screens.size })
+    val pagerState = rememberPagerState(initialPage = 1, pageCount = { screens.size })
     val coroutineScope = rememberCoroutineScope()
 
     var currentPage by remember { mutableIntStateOf(0) }
