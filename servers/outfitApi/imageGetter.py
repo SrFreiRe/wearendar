@@ -108,7 +108,7 @@ def descargar_imagen_zara(url_producto, tienda):
 
         # Obtener la URL de la imagen
         img_url = img_element.get_attribute('src')
-        print("URL de la imagen encontrada:", img_url)
+        return img_url
 
     except Exception as e:
         print("Ocurrió un error:", e)
