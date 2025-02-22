@@ -265,7 +265,8 @@ fun MonthView(){
                                         .background(if(day == today) Color.Black else Color.White)
                                 ) {
                                     Box(
-                                        modifier = Modifier.fillMaxSize(),
+                                        modifier = Modifier
+                                            .fillMaxSize(),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -275,6 +276,14 @@ fun MonthView(){
                                             fontStyle = FontStyle.Normal,
                                             fontSize = 18.sp,
                                         )
+                                    }
+
+                                    if (eventMap.containsKey(day)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(12.dp)
+                                                .background(if(day == today ) Color.White else Color.Black),
+                                        ){}
                                     }
                                 }
                             }
