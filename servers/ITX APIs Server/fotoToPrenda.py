@@ -9,7 +9,7 @@ import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
-TOKEN_FILE = "../../microservicios/token.json"
+TOKEN_FILE = "token.json"
 
 
 def get_token():
@@ -153,7 +153,7 @@ def prendasDeImagen():
     URLImagen = clothes.get("URL")
     print(URLImagen)
 
-    productos = get_products(URLImagen[00], token)
+    productos = get_products(URLImagen[0], token)
 
     return jsonify(productos)
 

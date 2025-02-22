@@ -9,7 +9,7 @@ import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
-TOKEN_FILE = "../../microservicios/token.json"
+TOKEN_FILE = "token.json"
 
 def get_token():
     """Obtiene un token de acceso desde Inditex OAuth2 API y lo almacena en un archivo local con un timestamp."""
@@ -173,5 +173,5 @@ def getProducts_multiplePrompts():
 
 
 if __name__ == '__main__':
-    # app.run(debug=True, port=5002)
-    print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
+    app.run(debug=True, port=5002)
+    # print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
