@@ -4,7 +4,8 @@ import json
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
-
+app = Flask(__name__)
+swagger = Swagger(app)
 
 def get_token():
   """Obtiene un token de acceso desde Inditex OAuth2 API y lo devuelve como un diccionario."""
@@ -165,7 +166,12 @@ def getProducts_multiplePrompts():
     for i in listaPrompts:
       productos = get_products(i, token)
       #Añadimos productos a un Yeison, con la i como key (para agruparlos)
-      data[i] = productos
+      if productos:
+        # Si la clave ya existe, agregamos los productos sin duplicar
+        if i in data:
+          data[i] = list(set(data[i] + productos))  # Añadir y evitar duplicados
+        else:
+          data[i] = productos  # Primera vez que se añade la clave
     return data
 
 if __name__ == '__main__':
