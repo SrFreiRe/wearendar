@@ -9,6 +9,9 @@ import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
+from imageGetter import get_image_url
+
+
 TOKEN_FILE = "token.json"
 
 
@@ -155,8 +158,15 @@ def prendasDeImagen():
 
     productos = get_products(URLImagen[0], token)
 
+    for producto in productos:
+        producto["price"] = producto["price"]
+        producto["name"] = producto["name"]
+        producto["brand"] = producto["brand"]
+        producto["link"] = producto["link"]
+        producto["photo"] = get_image_url(producto["link"], producto["brand"])
+
     return jsonify(productos)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    app.run(debug=True, port=5003)
