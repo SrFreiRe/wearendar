@@ -174,10 +174,9 @@ def getProducts_multiplePrompts():
                 data[i] = list(set(data[i] + productos))
             else:
                 data[i] = productos'''
-
-    # Funcionamiento con categorías
     data = {}
-    print(clothes)
+
+    # Funcionamiento con categoría
     for item in clothes["outfit"]:
         category = item["category"]
         description = item["description"]
@@ -210,7 +209,8 @@ def getProducts_multiplePrompts():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    get_products("Zapatos", get_token(), brand="zara",perPage=5)
+    # app.run(debug=True, port=5002)
     # print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
 
 

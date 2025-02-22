@@ -199,5 +199,5 @@ def is_model_image(img_url, tienda):
         return False
 
 
-get_image_url("https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", "bershka")
+# get_image_url("https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", "bershka")
 
