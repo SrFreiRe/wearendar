@@ -56,7 +56,7 @@ def obtener_imagen_inditex(driver, tienda):
         # Esperar hasta que la imagen con alt="Image 5" o "Imagen 4" esté presente en el DOM, esta es la imagen limpia del producto
         wait = WebDriverWait(driver, 10)
         img_element = wait.until(EC.presence_of_element_located(
-            (By.XPATH, '//img[contains(@alt, "Image 5") or contains(@alt, "Imagen 4")]')
+            (By.XPATH, '//img[contains(@alt, "Image 4") or contains(@alt, "Imagen 4")]')
         ))
 
     elif tienda == "massimodutti":
@@ -108,7 +108,7 @@ def descargar_imagen_zara(url_producto, tienda):
 
         # Obtener la URL de la imagen
         img_url = img_element.get_attribute('src')
-        return img_url
+        print(img_url)
 
     except Exception as e:
         print("Ocurrió un error:", e)
@@ -118,5 +118,5 @@ def descargar_imagen_zara(url_producto, tienda):
 
 
 # Ejemplo de uso
-url_producto = "https://www.massimodutti.com/es/pantalon-parachute-piel-ante-l05304914?pelement=47370412"
-descargar_imagen_zara(url_producto, "massimodutti")
+url_producto = "https://www.zara.com/es/en/limited-edition-jacquard-cardigan-p07140405.html?v1=418123741"
+descargar_imagen_zara(url_producto, "zara")
