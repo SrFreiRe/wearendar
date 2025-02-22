@@ -1,0 +1,262 @@
+[
+    {
+        "id": "550682210",
+        "name": "Printed shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 22.99,
+                "original": null
+            }
+        },
+        "link": "https://pullandbearcom.inditex.com/es/en/-l04471211",
+        "brand": "pullandbear"
+    },
+    {
+        "id": "43305225",
+        "name": "100% cotton shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 19.95,
+                "original": 49.95
+            }
+        },
+        "link": "https://massimodutticom.inditex.com/es/en/-l00167112",
+        "brand": "massimodutti"
+    },
+    {
+        "id": "153340788",
+        "name": "Short-sleeved technical T-shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 7.99,
+                "original": 22.99
+            }
+        },
+        "link": "https://oyshocom.inditex.com/es/en/-l30267217",
+        "brand": "oysho"
+    },
+    {
+        "id": "378934644",
+        "name": "Oversized poplin striped shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 9.99,
+                "original": 19.99
+            }
+        },
+        "link": "https://stradivariuscom.inditex.com/es/en/-l02028694",
+        "brand": "stradivarius"
+    },
+    {
+        "id": null,
+        "name": "STRIPED SHIRT X STUDIO NICHOLSON",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 39.95,
+                "original": null
+            }
+        },
+        "link": "https://zaracom.inditex.com/es/en/-P02008395.html",
+        "brand": "zara"
+    },
+    {
+        "id": "161885680",
+        "name": "Short sleeve lyocell blend T-shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 15.99,
+                "original": null
+            }
+        },
+        "link": "https://oyshocom.inditex.com/es/en/-l30401379",
+        "brand": "oysho"
+    },
+    {
+        "id": null,
+        "name": "WATERCOLOUR PRINT SHIRT",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 29.95,
+                "original": null
+            }
+        },
+        "link": "https://zaracom.inditex.com/es/en/-P01034402.html",
+        "brand": "zara"
+    },
+    {
+        "id": null,
+        "name": "RIBBED RACERBACK TOP",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 5.95,
+                "original": null
+            }
+        },
+        "link": "https://zaracom.inditex.com/es/en/-P09006761.html",
+        "brand": "zara"
+    },
+    {
+        "id": "161885697",
+        "name": "Short sleeve cotton blend T-shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 12.99,
+                "original": null
+            }
+        },
+        "link": "https://oyshocom.inditex.com/es/en/-l30257628",
+        "brand": "oysho"
+    },
+    {
+        "id": "161887156",
+        "name": "100% cotton short-sleeved T-shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 12.99,
+                "original": null
+            }
+        },
+        "link": "https://oyshocom.inditex.com/es/en/-l30257202",
+        "brand": "oysho"
+    },
+    {
+        "id": "599454085",
+        "name": "2-Pack of basic polo shirts",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 3.99,
+                "original": null
+            }
+        },
+        "link": "https://leftiescom.inditex.com/es/en/C1104800P599454085.html",
+        "brand": "lefties"
+    },
+    {
+        "id": "154420286",
+        "name": "Sleeveless mesh T-shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 7.99,
+                "original": 19.99
+            }
+        },
+        "link": "https://oyshocom.inditex.com/es/en/-l30220371",
+        "brand": "oysho"
+    },
+    {
+        "id": "532768158",
+        "name": "Cropped satin shirt with bell sleeves",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 5.99,
+                "original": 19.99
+            }
+        },
+        "link": "https://pullandbearcom.inditex.com/es/en/-l08471355",
+        "brand": "pullandbear"
+    },
+    {
+        "id": "538015034",
+        "name": "Long sleeve check shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 5.99,
+                "original": 25.99
+            }
+        },
+        "link": "https://pullandbearcom.inditex.com/es/en/-l08471376",
+        "brand": "pullandbear"
+    },
+    {
+        "id": "550676955",
+        "name": "Wrinkled fabric shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 25.99,
+                "original": null
+            }
+        },
+        "link": "https://pullandbearcom.inditex.com/es/en/-l04471201",
+        "brand": "pullandbear"
+    },
+    {
+        "id": "529132008",
+        "name": "Short sleeve white shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 3.99,
+                "original": 19.99
+            }
+        },
+        "link": "https://pullandbearcom.inditex.com/es/en/-l08471335",
+        "brand": "pullandbear"
+    },
+    {
+        "id": "609065871",
+        "name": "Baseball-style T-shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 2.99,
+                "original": null
+            }
+        },
+        "link": "https://leftiescom.inditex.com/es/en/C1019102P609065871.html",
+        "brand": "lefties"
+    },
+    {
+        "id": "529819473",
+        "name": "Rustic striped shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 5.99,
+                "original": 22.99
+            }
+        },
+        "link": "https://pullandbearcom.inditex.com/es/en/-l08471301",
+        "brand": "pullandbear"
+    },
+    {
+        "id": "530105840",
+        "name": "Rustic striped shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 5.99,
+                "original": 25.99
+            }
+        },
+        "link": "https://pullandbearcom.inditex.com/es/en/-l08471340",
+        "brand": "pullandbear"
+    },
+    {
+        "id": "594946653",
+        "name": "Cropped denim shirt",
+        "price": {
+            "currency": "EUR",
+            "value": {
+                "current": 6.99,
+                "original": null
+            }
+        },
+        "link": "https://leftiescom.inditex.com/es/en/C1494103P594946653.html",
+        "brand": "lefties"
+    }
+]
