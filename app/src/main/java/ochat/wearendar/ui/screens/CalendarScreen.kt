@@ -14,7 +14,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,17 +31,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,8 +50,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -66,24 +58,23 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.exyte.animatednavbar.utils.ballTransform
-import com.wajahatkarim.flippable.FlipAnimationType
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
 import kotlinx.coroutines.delay
-import ochat.wearendar.R
 import ochat.wearendar.data.Event
+import ochat.wearendar.data.Wear
 import ochat.wearendar.ui.theme.MontserratFontFamily
 import ochat.wearendar.ui.theme.WearendarTheme
 import ochat.wearendar.utils.eventMap
 import ochat.wearendar.utils.formatDate
+import ochat.wearendar.utils.wears
+import ochat.wearendar.utils.wearsList
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -325,10 +316,6 @@ fun DayView(
     var eventCardHeight by remember { mutableStateOf(0) }
 
     val eventPositions = remember { mutableStateMapOf<Event, Offset>() }
-
-    val eventAlpha = remember { mutableStateMapOf<Int, Float>().apply {
-        events.forEach { put(it.id, 1f) }
-    } }
 
         // OFFSET CALCULATIONS
     val density = LocalDensity.current
@@ -657,7 +644,7 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
                                 .fillMaxSize()
                                 .border(1.dp, Color.Black)
                         ) {
-                            BackSideContent(onBack = { isClosing = true })
+                            BackSideContent(onBack = { isClosing = true }, wearsList)
                         }
                     },
                     flipController = flipController,
@@ -722,7 +709,7 @@ fun FrontSideContent(event: Event){
 }
 
 @Composable
-fun BackSideContent(onBack: () -> Unit) {
+fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -754,9 +741,10 @@ fun BackSideContent(onBack: () -> Unit) {
                             .fillMaxWidth()
                             .weight(1f),
                     ) {
+                        val wear = wears[0][0]
                         Image(
-                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
-                            contentDescription = "Image 1",
+                            painter = painterResource(id = wear.img), // Replace with actual drawable
+                            contentDescription = wear.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(0.65f)
@@ -765,14 +753,13 @@ fun BackSideContent(onBack: () -> Unit) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Image(
-                            painter = painterResource(id = R.drawable.massimodutti), // Replace with actual drawable
-                            contentDescription = "Image 2",
+                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
+                            contentDescription = wear.brand.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(0.25f)
                         )
 
-                        // 🔹 Subtitle (10% Height)
                         Text(
                             text = "23.50$",
                             fontSize = 20.sp,
@@ -797,9 +784,10 @@ fun BackSideContent(onBack: () -> Unit) {
                             .fillMaxWidth()
                             .weight(1f),
                     ) {
+                        val wear = wears[1][0]
                         Image(
-                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
-                            contentDescription = "Image 1",
+                            painter = painterResource(id = wear.img), // Replace with actual drawable
+                            contentDescription = wear.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(0.65f)
@@ -808,14 +796,13 @@ fun BackSideContent(onBack: () -> Unit) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Image(
-                            painter = painterResource(id = R.drawable.bershka), // Replace with actual drawable
-                            contentDescription = "Image 2",
+                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
+                            contentDescription = wear.brand.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(0.25f)
                         )
 
-                        // 🔹 Subtitle (10% Height)
                         Text(
                             text = "23.50$",
                             fontSize = 20.sp,
@@ -849,26 +836,27 @@ fun BackSideContent(onBack: () -> Unit) {
                             .fillMaxWidth()
                             .weight(1f),
                     ) {
+                        val wear = wears[2][0]
                         Image(
-                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
-                            contentDescription = "Image 1",
+                            painter = painterResource(id = wear.img), // Replace with actual drawable
+                            contentDescription = wear.name,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(0.65f)
+                                .weight(0.65f),
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Image(
-                            painter = painterResource(id = R.drawable.zara), // Replace with actual drawable
-                            contentDescription = "Image 2",
+                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
+                            contentDescription = wear.brand.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(0.25f)
                         )
 
                         Text(
-                            text = "45.99$",
+                            text = "23.50$",
                             fontSize = 20.sp,
                             fontFamily = MontserratFontFamily,
                             color = Color.Black,
@@ -891,9 +879,10 @@ fun BackSideContent(onBack: () -> Unit) {
                             .fillMaxWidth()
                             .weight(1f),
                     ) {
+                        val wear = wears[3][0]
                         Image(
-                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
-                            contentDescription = "Image 1",
+                            painter = painterResource(id = wear.img), // Replace with actual drawable
+                            contentDescription = wear.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(0.65f)
@@ -902,22 +891,21 @@ fun BackSideContent(onBack: () -> Unit) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Image(
-                            painter = painterResource(id = R.drawable.pullbear), // Replace with actual drawable
-                            contentDescription = "Image 2",
+                            painter = painterResource(id = wear.brand.drawable), // Replace with actual drawable
+                            contentDescription = wear.brand.name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(0.25f)
                         )
 
-                        // 🔹 Subtitle (10% Height)
                         Text(
-                            text = "5.99$",
+                            text = "23.50$",
                             fontSize = 20.sp,
                             fontFamily = MontserratFontFamily,
                             color = Color.Black,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(0.10f) // 10% Height
+                                .weight(0.10f)
                                 .wrapContentHeight(Alignment.CenterVertically)
                                 .wrapContentWidth(Alignment.CenterHorizontally)
                         )

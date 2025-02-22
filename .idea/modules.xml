@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/wearendar.iml" filepath="$PROJECT_DIR$/.idea/wearendar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Wearendar.iml" filepath="$PROJECT_DIR$/.idea/modules/Wearendar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Wearendar.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Wearendar.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Wearendar.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Wearendar.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Wearendar.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Wearendar.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Wearendar.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Wearendar.app.unitTest.iml" />
     </modules>
   </component>
 </project>
