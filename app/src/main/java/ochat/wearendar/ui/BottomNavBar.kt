@@ -1,5 +1,6 @@
 package ochat.wearendar.ui
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.AnimatedNavigationBar
+import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
 import ochat.wearendar.ui.screens.Screen
 
 @Composable
@@ -24,6 +26,7 @@ fun BottomNavigationBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
             .fillMaxWidth(),
         selectedIndex = selectedIndex,
         barColor = Color.Black,
+        ballAnimation = Parabolic(tween(300))
     ) {
         screens.forEachIndexed { index, screen ->
             Box(
