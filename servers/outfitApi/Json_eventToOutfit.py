@@ -1,5 +1,6 @@
 import datetime
 import os
+import requests  # 🔹 Importamos requests para hacer la petición HTTP
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -25,6 +26,7 @@ auth = HTTPTokenAuth(scheme='Bearer')
 def verify_token(token):
     return token == API_TOKEN
 
+TEXT_TO_CLOTHES_URL = "http://127.0.0.1:5002/generate_outfit"  # 🔹 URL del servidor de la API de inditex
 
 @app.route('/generate_outfit', methods=['POST'])
 # @auth.login_required
@@ -77,41 +79,55 @@ def generate_outfit():
     if not event_data:
         return jsonify({'error': 'No se proporcionó información del evento.'}), 400
 
+    # Es una lista de 1 elemento, por lo que lo tomamos
+    if isinstance(event_data, list):
+        event_data = event_data[0]
+
     event_summary = event_data.get("summary", "General event")
     event_location = event_data.get("location", "Unknown location")
     event_date = event_data.get("start", "Unknown date")
     event_description = event_data.get("description", "")
+    genero = event_data.get("gender", "indefinido")
+
+
+    json_template = json.dumps(
+        {
+            "outfit": [
+                "Una chaqueta de lana azul marino con solapas clásicas y cierre de dos botones, ideal para reuniones formales.",
+                "Un pantalón de vestir gris oscuro de corte entallado, con bolsillos laterales y cinturilla ajustada.",
+                "Zapatos de cuero negro estilo Oxford con suela de goma y acabado pulido, perfectos para eventos elegantes."
+            ]
+        }
+    )
 
     prompt = f'''
-        Based on the following event, describe an ideal outfit with enough detail to help a fashion search engine find similar products.
+        Basado en el siguiente evento, describe un conjunto de prendas ideales con suficiente detalle para ayudar a un motor de búsqueda de moda a encontrar productos similares.
 
-        **Event Details:**
-        - **Event Name**: {event_summary}
-        - **Location**: {event_location}
-        - **Date**: {event_date}
-        - **Description**: {event_description}
+        **Detalles del evento:**
+        - **Nombre del evento**: {event_summary}
+        - **Ubicación**: {event_location}
+        - **Fecha**: {event_date}
+        - **Descripción**: {event_description}
 
-        **Guidelines for the description:**
-        1. **Type of clothing**: Clearly state if it's a shirt, pants, jacket, dress, etc.
-        2. **Material**: Mention if it's made of cotton, linen, leather, wool, etc.
-        3. **Color and shades**: Be specific (e.g., navy blue instead of just blue).
-        4. **Style**: Indicate if it's formal, casual, sporty, elegant, streetwear, etc.
-        5. **Details**: Include relevant features (e.g., buttons, zippers, pockets, patterns).
-        6. **Weather suitability**: Mention if it's ideal for summer, winter, rainy days, etc.
-        7. **Avoid mentioning brands.**
-        8. **Write the entire description in English.**
+        **Instrucciones para la descripción:**
+        1. **Indica claramente el tipo de prenda**: camisa, pantalón, chaqueta, vestido, etc.
+        2. **Menciona el material**: algodón, lino, cuero, lana, etc.
+        3. **Especifica el color y tonalidades**: Sé preciso (ej. azul marino en lugar de solo azul).
+        4. **Indica el estilo**: Formal, casual, deportivo, elegante, streetwear, etc.
+        5. **Incluye detalles relevantes**: Botones, cremalleras, bolsillos, patrones, tipo de ajuste (entallado, holgado, clásico).
+        6. **Menciona la adecuación climática**: Ideal para verano, invierno, días lluviosos, etc.
+        7. **No menciones marcas.**
+        8. **Devuelve solo una lista JSON válida con las descripciones de las prendas, sin texto adicional.**
 
-        Example output:
-        "A navy blue slim-fit cotton shirt with a button-up design, long sleeves, and a standard collar. Perfect for business casual occasions or formal meetings."
-
-        Now, based on the event details, describe a full outfit in English.
+        **Ejemplo de salida:**
+        {json_template}
         '''
 
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Eres un asistente experto en moda y estilismo."},
+                {"role": "system", "content":  "You are an expert in fasion and esthetics"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -119,21 +135,28 @@ def generate_outfit():
         outfit_json = response.choices[0].message.content
 
         ### Limpieza del json
-        # 🔹 1️Eliminar los bloques ```json ... ```
         clean_json_str = re.sub(r"^```json|```$", "", outfit_json.strip(), flags=re.MULTILINE).strip()
-
-        # 🔹 2️ Eliminar caracteres de escape innecesarios (\n y \")
         clean_json_str = clean_json_str.replace("\n", "").replace("\\n", "").replace('\\"', '"')
 
-        # 🔹 3️ Convertir el string limpio en JSON real
+        # 🔹 Convertir el string limpio en JSON real
         try:
             outfit_list = json.loads(clean_json_str)
         except json.JSONDecodeError as e:
             return jsonify({'error': f'JSON inválido generado por OpenAI: {str(e)}', 'raw_output': outfit_json}), 500
 
-        return jsonify({'outfit': outfit_list})
+        # 🔹 Enviar el resultado al servidor de Inditex para obtener productos
+        #response = requests.post(TEXT_TO_CLOTHES_URL, json={"outfit": outfit_list})
+
+        # Para conexión con "textToPrenda"
+        '''if response.status_code == 200:
+            return response.json()  # Devuelve la respuesta de Inditex
+        else:
+            return jsonify({'error': 'Error en la consulta a Inditex', 'details': response.text}), 500'''
+
+        # Para pruebas en local comentar el if de justo arriba
+        return jsonify(outfit_list)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    app.run(debug=True, port=5001)
