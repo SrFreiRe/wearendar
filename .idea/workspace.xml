@@ -4,12 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="62fd5dca-e39f-4861-abb5-07f4ca30b68e" name="Changes" comment="Foto a prendas en producción">
+    <list default="true" id="62fd5dca-e39f-4861-abb5-07f4ca30b68e" name="Changes" comment="Refactorización de estructura de archivos">
+      <change afterPath="$PROJECT_DIR$/servers/ITX APIs Server/Examples/Example Description Output" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/servers/ITX APIs Server/Examples/curl_execution_ServerAPI_eventToPrenda" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/servers/ITX APIs Server/Examples/input_JsonEvent.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/servers/ITX APIs Server/rutaDriverChrome" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/microservicios/productos.json" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/productos.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/microservicios/token.json" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/token.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servers/ITX APIs Server/fotoToPrenda.py" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/fotoToPrenda.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/servers/ITX APIs Server/textToPrenda.py" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/textToPrenda.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servers/outfitApi/.env" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servers/outfitApi/ELIMINAR" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/Examples/Ejemplo entrada textToPrenda" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servers/outfitApi/Json_eventToOutfit.py" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/Json_eventToOutfit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servers/outfitApi/imageGetter.py" beforeDir="false" afterPath="$PROJECT_DIR$/servers/ITX APIs Server/imageGetter.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,27 +55,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Postman3.executor": "Run",
-    "Python.fotoToPrenda.executor": "Run",
-    "Python.postman.executor": "Run",
-    "Python.postman2.executor": "Run",
-    "Python.textToPrenda.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/mateo/OneDrive/Escritorio/mateo/GrEI/ArqCom/P2/wearendar/servers/ITX APIs Server",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Postman3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.fotoToPrenda.executor&quot;: &quot;Run&quot;,
+    &quot;Python.postman.executor&quot;: &quot;Run&quot;,
+    &quot;Python.postman2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.textToPrenda.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/mateo/OneDrive/Escritorio/mateo/GrEI/ArqCom/P2/wearendar/servers/ITX APIs Server/Examples&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\mateo\OneDrive\Escritorio\mateo\GrEI\ArqCom\P2\wearendar\servers\ITX APIs Server\Examples" />
       <recent name="C:\Users\mateo\OneDrive\Escritorio\mateo\GrEI\ArqCom\P2\wearendar\servers\ITX APIs Server" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -125,7 +131,8 @@
       <updated>1740193198424</updated>
       <workItem from="1740193199856" duration="36000" />
       <workItem from="1740193270496" duration="21161000" />
-      <workItem from="1740222859978" duration="950000" />
+      <workItem from="1740222859978" duration="1823000" />
+      <workItem from="1740234433666" duration="4121000" />
     </task>
     <task id="LOCAL-00001" summary="Conexión con la API de InditexTech a través de las funciones de textToPrenda.py&#10;&#10;Siguente:&#10;Exportar como servidor en flask.">
       <option name="closed" value="true" />
@@ -231,7 +238,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740222902929</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Refactorización de estructura de archivos">
+      <option name="closed" value="true" />
+      <created>1740223893886</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1740223893886</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -256,13 +271,14 @@
     <MESSAGE value="Previo a cambio de función de búsqueda a producción&#10;&#10;Siguente:&#10;Mover a servidor de producción en vez de BD" />
     <MESSAGE value="Cambio completo a producción.&#10;&#10;Siguente: &#10;cambiar para generar un token solo cuando el anterior está expirado." />
     <MESSAGE value="Foto a prendas en producción" />
-    <option name="LAST_COMMIT_MESSAGE" value="Foto a prendas en producción" />
+    <MESSAGE value="Refactorización de estructura de archivos" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactorización de estructura de archivos" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/wearendar$Postman3.coverage" NAME="Postman3 Coverage Results" MODIFIED="1740206217695" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
     <SUITE FILE_PATH="coverage/wearendar$postman.coverage" NAME="postman Coverage Results" MODIFIED="1740206581421" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
-    <SUITE FILE_PATH="coverage/wearendar$textToPrenda.coverage" NAME="textToPrenda Coverage Results" MODIFIED="1740223659590" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
+    <SUITE FILE_PATH="coverage/wearendar$textToPrenda.coverage" NAME="textToPrenda Coverage Results" MODIFIED="1740237920817" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
     <SUITE FILE_PATH="coverage/wearendar$postman2.coverage" NAME="postman2 Coverage Results" MODIFIED="1740201760056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
-    <SUITE FILE_PATH="coverage/wearendar$fotoToPrenda.coverage" NAME="fotoToPrenda Coverage Results" MODIFIED="1740222490792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/ITX APIs Server" />
+    <SUITE FILE_PATH="coverage/wearendar$fotoToPrenda.coverage" NAME="fotoToPrenda Coverage Results" MODIFIED="1740223852296" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/ITX APIs Server" />
   </component>
 </project>

@@ -16,8 +16,10 @@ def configurar_driver():
     chrome_options.add_argument("--disable-dev-shm-usage")  # Evitar errores de memoria
     chrome_options.add_argument("--disable-gpu")  # Deshabilitar la aceleración de hardware
 
-    # Ruta de ChromeDriver
-    service = Service('C:/Users/juanf/Downloads/chromedriver-win64/chromedriver.exe')
+    # Ruta de ChromeDriver cargada del file "rutaChromeDriver"
+    ruta_chrome_driver = "C:\\Users\\mateo\\OneDrive\\Escritorio\\chromedriver-win64\\chromedriver.exe"
+
+    service = Service(ruta_chrome_driver)
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
@@ -137,10 +139,10 @@ def descargar_imagen_zara(url_producto, tienda):
     except Exception as e:
         print("Ocurrió un error:", e)
         return None
-    finally:
-        driver.quit()
+    # finally:
+        # driver.quit()
 
 
-# Ejemplo de uso
-url_producto = "https://www.lefties.com/es/mujer/novedades/jeans-culotte-el%C3%A1stico-c1030267503p659622175.html?colorId=428&parentId=659626182#fromrecommendation"
-descargar_imagen_zara(url_producto, "lefties")
+# # Ejemplo de uso
+# url_producto = "https://www.lefties.com/es/mujer/novedades/jeans-culotte-el%C3%A1stico-c1030267503p659622175.html?colorId=428&parentId=659626182#fromrecommendation"
+# descargar_imagen_zara(url_producto, "lefties")
