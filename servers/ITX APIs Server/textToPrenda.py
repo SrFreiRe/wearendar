@@ -1,15 +1,17 @@
+import imageGetter
 import http.client
 import base64
 import json
 import time
 import os
 import urllib.parse
-
 import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
 TOKEN_FILE = "token.json"
+
+
 
 def get_token():
     """Obtiene un token de acceso desde Inditex OAuth2 API y lo almacena en un archivo local con un timestamp."""
@@ -106,58 +108,62 @@ def get_products(query, access_token, brand="", perPage=5):
 app = Flask(__name__)
 swagger = Swagger(app)
 
-
 @app.route('/generate_outfit', methods=['POST'])
 def getProducts_multiplePrompts():
     """
-    Genera una lista de productos basada en los outfits generados.
-    ---
-    tags:
-      - Outfits
-    parameters:
-      - name: clothes
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            outfit:
+  Genera una lista de productos basada en los outfits generados.
+  ---
+  tags:
+    - Outfits
+  parameters:
+    - name: clothes
+      in: body
+      required: true
+      schema:
+        type: object
+        properties:
+          outfit:
+            type: array
+            items:
+              type: string
+              example: "Camisa de botones blanca"
+  responses:
+    200:
+      description: JSON con los productos recomendados para cada prenda
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties:
               type: array
               items:
-                type: string
-                example: "Camisa de botones blanca"
-    responses:
-      200:
-        description: JSON con los productos recomendados para cada prenda
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      example: "Camisa de lino blanca"
-                    price:
-                      type: number
-                      example: 39.99
-                    link:
-                      type: string
-                      example: "https://ejemplo.com/camisa-blanca"
-      400:
-        description: Error en los datos enviados
-      500:
-        description: Error interno del servidor
-    """
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Camisa de lino blanca"
+                  price:
+                    type: number
+                    example: 39.99
+                  link:
+                    type: string
+                    example: "https://ejemplo.com/camisa-blanca"
+    400:
+      description: Error en los datos enviados
+    500:
+      description: Error interno del servidor
+  """
+    # Token de API Inditex
     token = get_token()
     if not token:
         return jsonify({"error": "No se pudo obtener el token"}), 500
 
+    # Input json
     clothes = request.get_json()
-    listaPrompts = clothes.get("outfit", [])
+    print (json.dumps(clothes, indent=4))
+
+    # Forma de funcionamiento sin inclusión de categorías
+    '''listaPrompts = clothes.get("outfit", [])
     data = {}
 
     for i in listaPrompts:
@@ -167,7 +173,38 @@ def getProducts_multiplePrompts():
             if i in data:
                 data[i] = list(set(data[i] + productos))
             else:
-                data[i] = productos
+                data[i] = productos'''
+
+    # Funcionamiento con categorías
+    data = {}
+    print(clothes)
+    for item in clothes["outfit"]:
+        category = item["category"]
+        description = item["description"]
+        query = description + " De estilo " + category + "."
+        productos = get_products(query, token, perPage=5)
+
+        print(f"Productos ->  {productos}")
+        print(f"Tipo productos ->  + {type(productos)}")
+
+        if productos:
+            if isinstance(productos, dict) and productos.get("title") == "Bad Request":
+                print()
+                print("Error in request to API -> query was too specific")
+                print()
+                continue
+            # Añadir la categoría a cada producto encontrado
+            for producto in productos:
+                producto["category"] = category  # Agrega la categoría a cada producto
+                producto["brand"] = productos[0]["brand"]
+                producto["description"] = description
+                producto["photo"] = imageGetter.descargar_imagen_zara(producto["link"], producto["brand"])
+
+            # Si la descripción ya está en el diccionario, evita duplicados
+            if description in data:
+                data[description].extend(productos)
+            else:
+                data[description] = productos  # Primera vez que se añade
 
     return jsonify(data)
 
@@ -175,3 +212,6 @@ def getProducts_multiplePrompts():
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
     # print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
+
+
+

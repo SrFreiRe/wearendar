@@ -1,0 +1,20 @@
+{
+  "outfit": [
+    {
+      "category": "Formal",
+      "description": "Camisa blanca seda, manga larga."
+    },
+    {
+      "category": "Formal",
+      "description": "Pantalon negro vestir, corte entallado."
+    },
+    {
+      "category": "Formal",
+      "description": "Blazer azul marino lana, solapas de pico."
+    },
+    {
+      "category": "Formal",
+      "description": "Zapatos de charol negros, punta afilada."
+    }
+  ]
+}
