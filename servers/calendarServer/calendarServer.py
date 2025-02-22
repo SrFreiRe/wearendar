@@ -30,9 +30,26 @@ class GoogleCalendarManager:
             with open("token.json", "w") as token:
                 token.write(creds.to_json())
 
+        try:
+            return build("calendar", "v3", credentials=creds)
+        except Exception as e:
+            print(f"❌ Error en authenticate al inicializar Google Calendar API: {e}")
+            return None
+
     def list_calendars(self):
+        if not self.service:
+            print("❌ Error in list_calendars: self.service es None. Falló la autenticación.")
+            return []
+
         calendars_result = self.service.calendarList().list().execute()
-        return calendars_result.get('items', [])
+
+        calendars = calendars_result.get('items', [])
+        for calendar in calendars:
+            print(f"📅 Nombre: {calendar['summary']} | ID: {calendar['id']}")
+
+        # Filtrar calendarios que contengan 'holiday' en su ID
+        filtered_calendars = [cal for cal in calendars if 'holiday' not in cal['id'].lower()]
+        return filtered_calendars
 
     def list_upcoming_events(self, max_results=10):
         calendar_ids = self.list_calendars()
