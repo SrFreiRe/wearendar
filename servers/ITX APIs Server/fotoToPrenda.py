@@ -153,7 +153,7 @@ def prendasDeImagen():
     URLImagen = clothes.get("URL")
     print(URLImagen)
 
-    productos = get_products(URLImagen[0], token)
+    productos = get_products(URLImagen[00], token)
 
     return jsonify(productos)
 
