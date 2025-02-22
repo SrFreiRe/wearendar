@@ -97,8 +97,12 @@ def store_format(driver, store):
         max_scroll = driver.execute_script("return document.body.scrollHeight")
         do_scroll(driver, 1750, max_scroll)
 
-        img_elements = driver.find_elements(By.XPATH, '//img[contains(@class, "image-item") and (contains(@alt, "5") or contains(@alt, "6"))]')
-        img_urls = [img.get_attribute('src') for img in img_elements]
+        img_elements = driver.find_elements(By.CLASS_NAME, 'image-item')
+
+        # Filtra los elementos que tienen el atributo alt que contiene "5" o "6"
+        filtered_elements = [img for img in img_elements if
+                             '5' in img.get_attribute('alt') or '6' in img.get_attribute('alt')]
+        img_urls = [img.get_attribute('src') for img in filtered_elements]
         print(f"Imágenes encontradas: {img_urls}")
         return img_urls
 
