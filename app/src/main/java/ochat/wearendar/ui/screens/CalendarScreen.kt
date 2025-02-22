@@ -10,28 +10,39 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +56,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -52,12 +65,20 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.exyte.animatednavbar.utils.ballTransform
+import com.wajahatkarim.flippable.FlipAnimationType
+import com.wajahatkarim.flippable.Flippable
+import com.wajahatkarim.flippable.rememberFlipController
 import kotlinx.coroutines.delay
+import ochat.wearendar.R
 import ochat.wearendar.data.Event
 import ochat.wearendar.ui.theme.MontserratFontFamily
 import ochat.wearendar.ui.theme.WearendarTheme
@@ -65,6 +86,7 @@ import ochat.wearendar.utils.eventMap
 import ochat.wearendar.utils.formatDate
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
 
 @Preview
 @Composable
@@ -304,6 +326,10 @@ fun DayView(
 
     val eventPositions = remember { mutableStateMapOf<Event, Offset>() }
 
+    val eventAlpha = remember { mutableStateMapOf<Int, Float>().apply {
+        events.forEach { put(it.id, 1f) }
+    } }
+
         // OFFSET CALCULATIONS
     val density = LocalDensity.current
     val columnSpacing = 8.dp
@@ -323,13 +349,13 @@ fun DayView(
     // ANIMATIONS
     val offsetX by animateDpAsState(
         targetValue = if (moveToCenterStarted) centerX else initialXOffsetDp,
-        animationSpec = tween(durationMillis = 0, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 100, easing = FastOutSlowInEasing),
         label = "OffsetX"
     )
 
     val offsetY by animateDpAsState(
         targetValue = if (moveToCenterStarted) centerY else initialYOffsetDp,
-        animationSpec = tween(durationMillis = 0, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 100, easing = FastOutSlowInEasing),
         label = "OffsetY"
     )
 
@@ -425,16 +451,18 @@ fun DayView(
                         color = Color.Black
                     )
 
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(events) { event ->
-                            EventCard(event, onEventClick = { height, coordinates ->
-                                Log.d("DayView", "Selected Event: ${event.description}, Position: $coordinates")
-                                selectedEvent = event
-                                eventCardHeight = height
-                                eventPositions[event] = coordinates
-                            })
+                            val isEventSelected = selectedEvent == event
+
+                            EventCard(
+                                event,
+                                onEventClick = { height, coordinates ->
+                                    selectedEvent = event
+                                    eventCardHeight = height
+                                    eventPositions[event] = coordinates },
+                                    alpha = if (isEventSelected) 0f else 1f
+                            )
                         }
                     }
                 }
@@ -460,24 +488,27 @@ fun DayView(
 }
 
 @Composable
-fun EventCard(event: Event, onEventClick: (Int, Offset) -> Unit) {
+fun EventCard(event: Event, alpha: Float, onEventClick: (Int, Offset) -> Unit) {
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     var cardHeight by remember { mutableStateOf(0) }
     var position by remember { mutableStateOf(Offset.Zero) }
+
+    val borderWidth = if (alpha == 1f) 1.dp else 0.dp
+    val borderColor = if (alpha == 1f) Color.Black else Color.Transparent
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .background(Color.White)
-            .border(1.dp, Color.Black)
+            .border(borderWidth, borderColor)
+            .alpha(alpha)
             .onGloballyPositioned { layoutCoordinates ->
                 cardHeight = layoutCoordinates.size.height
                 position = layoutCoordinates.positionInRoot()
             }
             .clickable {
                 val correctedPosition = position.copy(y = position.y - cardHeight) // ✅ Adjust Y position
-                Log.d("EventCard", "Clicked Event: ${event.description}, Position: $correctedPosition")
                 onEventClick(cardHeight, correctedPosition)
             }
     ) {
@@ -495,7 +526,7 @@ fun EventCard(event: Event, onEventClick: (Int, Offset) -> Unit) {
             )
 
             Text(
-                text = event.description.uppercase(),
+                text = event.title.uppercase(),
                 fontFamily = MontserratFontFamily,
                 fontStyle = FontStyle.Normal,
                 fontSize = 16.sp,
@@ -529,7 +560,7 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
     var sizeAnimationStarted by remember { mutableStateOf(false) }
     var isClosing by remember { mutableStateOf(false) }
     var isExpanded by remember { mutableStateOf(false) }
-    var showContent by remember { mutableStateOf(false) }
+    val flipController =  rememberFlipController()
 
     // OFFSET CALCULATIONS
     val density = LocalDensity.current
@@ -547,7 +578,7 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
     // ANIMATIONS
     val offsetY by animateDpAsState(
         targetValue = if (moveToCenterStarted) centerY else initialYOffsetDp,
-        animationSpec = tween(durationMillis = 0, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 100, easing = FastOutSlowInEasing),
         label = "OffsetY"
     )
 
@@ -573,7 +604,6 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
 
     LaunchedEffect(isClosing) {
         if (isClosing) {
-            showContent = false
             isExpanded = false
             sizeAnimationStarted = false
             delay(300)
@@ -582,70 +612,371 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
             onDismiss()
         }
     }
-
-    // COMPOSE
+    val borderColor = if (isExpanded) Color.Transparent else Color.Black
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        contentAlignment = Alignment.TopStart
     ) {
         Box(
             modifier = Modifier
                 .offset(y = adjustedOffsetY)
                 .size(
-                    width =  dayWidth,
+                    width = dayWidth,
                     if (!isExpanded) height else dayHeight - 32.dp
                 )
                 .graphicsLayer(scaleX = 1f, scaleY = 1f, shape = RoundedCornerShape(16.dp))
                 .clickable {
                     isClosing = true
                 }
+                .border(1.dp, borderColor)
                 .background(Color.White)
-                .border(1.dp, Color.Black),
+                .alpha(1f),
         ) {
             AnimatedVisibility(
-                visible = showContent,
+                visible = isExpanded,
                 enter = fadeIn(animationSpec = tween(200)) +
                         slideInVertically(initialOffsetY = { it / 4 }, animationSpec = tween(200)),
                 exit = fadeOut(animationSpec = tween(200)) +
                         slideOutVertically(targetOffsetY = { it / 4 }, animationSpec = tween(200))
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = event.description.uppercase(),
-                        fontFamily = MontserratFontFamily,
-                        fontStyle = FontStyle.Normal,
-                        fontSize = 22.sp,
-                        color = Color.Black
-                    )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "Start Time: ${event.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
-                        fontSize = 18.sp,
-                        color = Color.Black
-                    )
-
-                    Text(
-                        text = "End Time: ${event.endTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
-                        fontSize = 18.sp,
-                        color = Color.Black
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(onClick = { isClosing = true }) {
-                        Text("Close")
-                    }
-                }
+                Flippable(
+                    frontSide = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .border(1.dp, Color.Black)
+                        ) {
+                            FrontSideContent(event)
+                        }
+                    },
+                    backSide = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .border(1.dp, Color.Black)
+                        ) {
+                            BackSideContent(onBack = { isClosing = true })
+                        }
+                    },
+                    flipController = flipController,
+                    flipDurationMs = 300,
+                    cameraDistance = 200f,
+                )
             }
         }
     }
 }
+
+@Composable
+fun FrontSideContent(event: Event){
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = event.title.uppercase(),
+            fontFamily = MontserratFontFamily,
+            fontSize = 20.sp,
+            fontStyle = FontStyle.Normal,
+            color = Color.Black,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = event.description,
+            fontFamily = MontserratFontFamily,
+            fontSize = 18.sp,
+            fontStyle = FontStyle.Normal,
+            color = Color.Black,
+            modifier = Modifier.weight(1f)
+        )
+
+        Text(
+            text = "Start: ${event.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+            fontFamily = MontserratFontFamily,
+            fontSize = 16.sp,
+            fontStyle = FontStyle.Normal,
+            color = Color.Black,
+        )
+
+        Text(
+            text = "End: ${event.endTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+            fontFamily = MontserratFontFamily,
+            fontSize = 16.sp,
+            fontStyle = FontStyle.Normal,
+            color = Color.Black
+        )
+
+        Text(
+            text = "Location: O Grove",
+            fontFamily = MontserratFontFamily,
+            fontSize = 16.sp,
+            fontStyle = FontStyle.Normal,
+            color = Color.Black
+        )
+    }
+}
+
+@Composable
+fun BackSideContent(onBack: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // 🔹 First Row (70% of the height) with 2 columns
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.8f),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.5f)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
+                            contentDescription = "Image 1",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.65f)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Image(
+                            painter = painterResource(id = R.drawable.massimodutti), // Replace with actual drawable
+                            contentDescription = "Image 2",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.25f)
+                        )
+
+                        // 🔹 Subtitle (10% Height)
+                        Text(
+                            text = "23.50$",
+                            fontSize = 20.sp,
+                            fontFamily = MontserratFontFamily,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.10f) // 10% Height
+                                .wrapContentHeight(Alignment.CenterVertically)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.5f)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
+                            contentDescription = "Image 1",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.65f)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Image(
+                            painter = painterResource(id = R.drawable.bershka), // Replace with actual drawable
+                            contentDescription = "Image 2",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.25f)
+                        )
+
+                        // 🔹 Subtitle (10% Height)
+                        Text(
+                            text = "23.50$",
+                            fontSize = 20.sp,
+                            fontFamily = MontserratFontFamily,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.10f) // 10% Height
+                                .wrapContentHeight(Alignment.CenterVertically)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+            }
+
+
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.5f)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
+                            contentDescription = "Image 1",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.65f)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Image(
+                            painter = painterResource(id = R.drawable.zara), // Replace with actual drawable
+                            contentDescription = "Image 2",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.25f)
+                        )
+
+                        Text(
+                            text = "45.99$",
+                            fontSize = 20.sp,
+                            fontFamily = MontserratFontFamily,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.10f) // 10% Height
+                                .wrapContentHeight(Alignment.CenterVertically)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.5f)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.example), // Replace with actual drawable
+                            contentDescription = "Image 1",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.65f)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Image(
+                            painter = painterResource(id = R.drawable.pullbear), // Replace with actual drawable
+                            contentDescription = "Image 2",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.25f)
+                        )
+
+                        // 🔹 Subtitle (10% Height)
+                        Text(
+                            text = "5.99$",
+                            fontSize = 20.sp,
+                            fontFamily = MontserratFontFamily,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.10f) // 10% Height
+                                .wrapContentHeight(Alignment.CenterVertically)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+            }
+        }
+
+        // 🔹 Second Row (30% of the height)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = { onBack() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(0.dp),
+                ) {
+                    Text(
+                        text = "REGEN",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = MontserratFontFamily,
+                    )
+                }
+
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Button(
+                    onClick = { onBack() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(0.dp),
+                ) {
+                    Text(
+                        text = "CLOSE",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = MontserratFontFamily,
+                    )
+                }
+
+            }
+        }
+    }
+}
+
