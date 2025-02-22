@@ -4,9 +4,12 @@ import androidx.compose.ui.graphics.Color
 import java.time.LocalTime
 
 data class Event(
+    val id: Int,
+    val title: String,
     val description: String,
     val startTime: LocalTime,
     val endTime: LocalTime,
+    val location: String,
     val type: EventType
 )
 
