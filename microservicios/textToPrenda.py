@@ -8,7 +8,6 @@ from flasgger import Swagger
 
 TOKEN_FILE = "token.json"
 
-
 def get_token():
     """Obtiene un token de acceso desde Inditex OAuth2 API y lo almacena en un archivo local con un timestamp."""
 
@@ -149,6 +148,7 @@ def getProducts_multiplePrompts():
     data = {}
 
     for i in listaPrompts:
+        print(i)
         productos = get_products(i, token)
         if productos:
             if i in data:

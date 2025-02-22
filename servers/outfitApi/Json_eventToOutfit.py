@@ -93,15 +93,16 @@ def generate_outfit():
     json_template = json.dumps(
         {
             "outfit": [
-                "Una chaqueta de lana azul marino con solapas clásicas y cierre de dos botones, ideal para reuniones formales.",
-                "Un pantalón de vestir gris oscuro de corte entallado, con bolsillos laterales y cinturilla ajustada.",
-                "Zapatos de cuero negro estilo Oxford con suela de goma y acabado pulido, perfectos para eventos elegantes."
+                "Camisa blanca de algodón con cuello clásico y botones frontales.",
+                "Blazer negro de algodón con solapas de pico y un botón.",
+                "Zapatos de cuero marrón oscuro con puntera fina y suela de cuero."
             ]
         }
     )
 
     prompt = f'''
-        Basado en el siguiente evento, describe un conjunto de prendas ideales con suficiente detalle para ayudar a un motor de búsqueda de moda a encontrar productos similares.
+        **Basado en el siguiente evento, describe un conjunto de prendas ideales con suficiente detalle para ayudar a un motor de búsqueda de moda a encontrar productos similares.**
+        **La descripción debe ser clara y concisa, sin adornos innecesarios, pero manteniendo información relevante sobre el evento.**
 
         **Detalles del evento:**
         - **Nombre del evento**: {event_summary}
@@ -118,9 +119,12 @@ def generate_outfit():
         6. **Menciona la adecuación climática**: Ideal para verano, invierno, días lluviosos, etc.
         7. **No menciones marcas.**
         8. **Devuelve solo una lista JSON válida con las descripciones de las prendas, sin texto adicional.**
+        9. **No uses tildes ni la letra 'ñ', usa 'n' en su lugar y evita caracteres especiales.**
+        10. **Ten en cuenta que estos textos tienen que ser entendidos por la API de Inditex llamada "product search".**
 
         **Ejemplo de salida:**
         {json_template}
+        
         '''
 
     try:
