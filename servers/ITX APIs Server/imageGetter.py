@@ -97,7 +97,7 @@ def store_format(driver, store):
         max_scroll = driver.execute_script("return document.body.scrollHeight")
         do_scroll(driver, 1750, max_scroll)
 
-        img_elements = driver.find_elements(By.CLASS_NAME, 'image-item')
+        img_elements = driver.find_elements(By.XPATH, '//img[contains(@class, "image-item") and (contains(@alt, "5") or contains(@alt, "6"))]')
         img_urls = [img.get_attribute('src') for img in img_elements]
         print(f"Imágenes encontradas: {img_urls}")
         return img_urls
@@ -116,27 +116,6 @@ def store_format(driver, store):
 
     return img_element  # Devolver el elemento de la imagen
 
-def download_image(url, tienda):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Referer": "https://www."+tienda+".com/",
-        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-    }
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()  # Verificar que la descarga fue exitosa
-
-    # Convertir la imagen a formato PNG si no lo está
-    img = Image.open(BytesIO(response.content))
-    if img.format != "PNG":
-        img = img.convert("RGB")  # Convertir a RGB si es necesario
-        png_buffer = BytesIO()
-        img.save(png_buffer, format="PNG")
-        png_buffer.seek(0)  # Rebobinar el buffer para leerlo desde el principio
-        return png_buffer
-    else:
-        return BytesIO(response.content)
-
-
 # Función principal que devuelve la URL de la imagen de un producto de Zara
 def get_image_url(url_producto, tienda):
     try:
@@ -150,10 +129,9 @@ def get_image_url(url_producto, tienda):
 
         # Filtrar imágenes que no sean de modelos
         best_url = lowest_skin_percentage(img_element,tienda)
-
+        print(f"Mejor URL encontrada: {best_url}")
         # Descargar la imagen desde la URL
-        img = download_image(best_url,tienda)
-        return img
+        return best_url
 
     except Exception as e:
         print("Ocurrió un error:", e)
@@ -164,7 +142,7 @@ def lowest_skin_percentage(img_urls,tienda):
     result_skin = 100
     for img_url in img_urls:
         skin_percentage = is_model_image(img_url,tienda)
-        if skin_percentage < result_skin:
+        if skin_percentage + 2 < result_skin:
             result_skin = skin_percentage
             result_url = img_url
     return result_url
@@ -201,4 +179,6 @@ def is_model_image(img_url, tienda):
         print("Error al analizar la imagen:", e)
         return False
 
+
+get_image_url("https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", "bershka")
 
