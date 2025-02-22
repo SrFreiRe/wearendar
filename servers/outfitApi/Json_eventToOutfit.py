@@ -77,17 +77,35 @@ def generate_outfit():
     if not event_data:
         return jsonify({'error': 'No se proporcionó información del evento.'}), 400
 
-    prompt = f'''
-    Basado en el siguiente evento:
-    {json.dumps(event_data, indent=4)}
+    event_summary = event_data.get("summary", "General event")
+    event_location = event_data.get("location", "Unknown location")
+    event_date = event_data.get("start", "Unknown date")
+    event_description = event_data.get("description", "")
 
-    **Genera una lista de prendas de ropa adecuadas para este evento.**
-    - Ten en cuenta el tipo de evento (por ejemplo, reuniones formales, citas, actividades deportivas, etc.).
-    - Considera la ubicación si está disponible.
-    - Si la fecha está en invierno, sugiere ropa más abrigada. Si está en verano, sugiere ropa más ligera.
-    - La lista debe incluir al menos 3 prendas, como camiseta/camisa, pantalón/falda y zapatos adecuados.
-    - Devuelve solo una lista JSON con los nombres de las prendas, sin texto adicional.
-    '''
+    prompt = f'''
+        Based on the following event, describe an ideal outfit with enough detail to help a fashion search engine find similar products.
+
+        **Event Details:**
+        - **Event Name**: {event_summary}
+        - **Location**: {event_location}
+        - **Date**: {event_date}
+        - **Description**: {event_description}
+
+        **Guidelines for the description:**
+        1. **Type of clothing**: Clearly state if it's a shirt, pants, jacket, dress, etc.
+        2. **Material**: Mention if it's made of cotton, linen, leather, wool, etc.
+        3. **Color and shades**: Be specific (e.g., navy blue instead of just blue).
+        4. **Style**: Indicate if it's formal, casual, sporty, elegant, streetwear, etc.
+        5. **Details**: Include relevant features (e.g., buttons, zippers, pockets, patterns).
+        6. **Weather suitability**: Mention if it's ideal for summer, winter, rainy days, etc.
+        7. **Avoid mentioning brands.**
+        8. **Write the entire description in English.**
+
+        Example output:
+        "A navy blue slim-fit cotton shirt with a button-up design, long sleeves, and a standard collar. Perfect for business casual occasions or formal meetings."
+
+        Now, based on the event details, describe a full outfit in English.
+        '''
 
     try:
         response = client.chat.completions.create(
@@ -118,4 +136,4 @@ def generate_outfit():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5002)
