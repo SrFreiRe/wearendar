@@ -61,49 +61,20 @@ def get_token():
 
 
 def get_products(query, access_token):
-  """Realiza una petición GET a la API de Inditex para buscar productos."""
-  HOST = "api-sandbox.inditex.com"
-  PORT = 443
-  SEARCH_ENDPOINT = "/searchpmpa/products"
-  """
-  Realiza una petición GET a la API de Inditex para buscar productos.
+  conn = http.client.HTTPSConnection("api.inditex.com")
+  headers = {
+      'Authorization': f'Bearer {access_token}',
+      'Content-Type': 'application/json'
+  }
 
-  :param query: Término de búsqueda (ejemplo: "shirt")
-  :param access_token: Token de acceso OAuth2 válido
-  :return: Diccionario con los resultados de la API o None si hay error.
-  """
-  try:
-    # Configurar la conexión HTTPS
-    conn = http.client.HTTPSConnection(HOST, PORT)
+  encoded_query = query.replace(' ', '%20')
+  endpoint = f"/searchpmpa/products?query={encoded_query}"
 
-    # Configurar headers con el token de acceso
-    headers = {
-      "Authorization": f"Bearer {access_token}",
-      "Content-Type": "application/json"
-    }
+  conn.request("GET", endpoint, headers=headers)
+  res = conn.getresponse()
+  data = res.read()
 
-    # Hacer la petición con el query
-    endpoint = f"{SEARCH_ENDPOINT}?query={query}"
-    conn.request("GET", endpoint, "", headers)
-
-    # Obtener la respuesta
-    res = conn.getresponse()
-    data = res.read().decode("utf-8")
-
-    # Imprimir detalles para depuración
-    print(f"HTTP Status: {res.status}")
-    print(f"Response: {data}")
-
-    # Convertir la respuesta a diccionario
-    if res.status == 200:
-      return json.loads(data)
-    else:
-      print("Error en la solicitud de productos.")
-      return None
-
-  except Exception as e:
-    print(f"Error en get_products(): {e}")
-    return None
+  return json.loads(data.decode("utf-8"))
 
 @app.route('/generate_outfit', methods=['POST'])
 def getProducts_multiplePrompts():
