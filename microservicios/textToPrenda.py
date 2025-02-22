@@ -1,179 +1,163 @@
 import http.client
 import base64
 import json
+import time
+import os
 from flask import Flask, request, jsonify
 from flasgger import Swagger
+
+TOKEN_FILE = "token.json"
+
+
+def get_token():
+    """Obtiene un token de acceso desde Inditex OAuth2 API y lo almacena en un archivo local con un timestamp."""
+
+    # Si el archivo de token existe, verificamos si el token sigue siendo válido
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE, "r") as file:
+            data = json.load(file)
+            timestamp = data.get("timestamp", 0)
+            current_time = time.time()
+
+            # Si el token tiene menos de 58 minutos, reutilizarlo
+            if current_time - timestamp < 3480:  # 58 minutos en segundos
+                return data.get("id_token")
+
+    # Configuración de OAuth2
+    HOST = "auth.inditex.com"
+    PORT = 443
+    TOKEN_ENDPOINT = "/openam/oauth2/itxid/itxidmp/access_token"
+    CLIENT_ID = "oauth-mkplace-oauthbgpcpiyyxjbigjylsbpropro"
+    CLIENT_SECRET = "EiV8_qt5a8-93._p"
+    SCOPE = "technology.catalog.read"
+
+    try:
+        # Codificar credenciales en Base64 para Basic Auth
+        credentials = f"{CLIENT_ID}:{CLIENT_SECRET}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+
+        # Configurar la conexión HTTPS
+        conn = http.client.HTTPSConnection(HOST, PORT)
+
+        # Crear payload
+        payload = f"grant_type=client_credentials&scope={SCOPE}"
+
+        # Configurar headers
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": f"Basic {encoded_credentials}"
+        }
+
+        # Hacer la petición
+        conn.request("POST", TOKEN_ENDPOINT, payload, headers)
+        res = conn.getresponse()
+        data = res.read().decode("utf-8")
+
+        # Manejar respuestas
+        if res.status == 200:
+            token_data = json.loads(data)
+            token_data["timestamp"] = time.time()
+
+            # Guardar el token en un archivo
+            with open(TOKEN_FILE, "w") as file:
+                json.dump(token_data, file)
+
+            return token_data.get("id_token")
+        else:
+            print("Error al obtener el token.")
+            return None
+    except Exception as e:
+        print(f"Error en get_token(): {e}")
+        return None
+
+
+import urllib.parse
+
+def get_products(query, access_token):
+    conn = http.client.HTTPSConnection("api.inditex.com")
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+
+    encoded_query = urllib.parse.quote(query)  # Codifica correctamente los caracteres especiales en la URL
+    endpoint = f"/searchpmpa/products?query={encoded_query}"
+
+    conn.request("GET", endpoint, headers=headers)
+    res = conn.getresponse()
+    data = res.read()
+
+    return json.loads(data.decode("utf-8"))
+
+
 
 app = Flask(__name__)
 swagger = Swagger(app)
 
-def get_token():
-  """Obtiene un token de acceso desde Inditex OAuth2 API y lo devuelve como un diccionario."""
-
-  # Configuración de OAuth2
-  HOST = "auth.inditex.com"
-  PORT = 443
-  TOKEN_ENDPOINT = "/openam/oauth2/itxid/itxidmp/sandbox/access_token"
-  CLIENT_ID = "oauth-mkpsbox-oauthyabmuqumslafcelioysnbxpro"
-  CLIENT_SECRET = "D8}2U0{6_e@s}w-."
-  SCOPE = "technology.catalog.read"
-
-  try:
-    # Codificar credenciales en Base64 para Basic Auth
-    credentials = f"{CLIENT_ID}:{CLIENT_SECRET}"
-    encoded_credentials = base64.b64encode(credentials.encode()).decode()
-
-    # Configurar la conexión HTTPS
-    conn = http.client.HTTPSConnection(HOST, PORT)
-
-    # Crear payload
-    payload = f"grant_type=client_credentials&scope={SCOPE}"
-
-    # Configurar headers
-    headers = {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": f"Basic {encoded_credentials}"
-    }
-
-    # Hacer la petición
-    conn.request("POST", TOKEN_ENDPOINT, payload, headers)
-    res = conn.getresponse()
-    data = res.read().decode("utf-8")
-
-    # Imprimir detalles para depuración
-    print(f"HTTP Status: {res.status}")
-    print(f"Response: {data}")
-
-    # Manejar respuestas
-    if res.status == 200:
-      return json.loads(data)  # Convertir JSON string a diccionario
-    else:
-      print("Error al obtener el token.")
-      return None
-
-  except Exception as e:
-    print(f"Error en get_token(): {e}")
-    return None
-
-
-
-
-
-
-def get_products(query, access_token):
-  """Realiza una petición GET a la API de Inditex para buscar productos."""
-  HOST = "api-sandbox.inditex.com"
-  PORT = 443
-  SEARCH_ENDPOINT = "/searchpmpa-sandbox/products"
-  """
-  Realiza una petición GET a la API de Inditex para buscar productos.
-
-  :param query: Término de búsqueda (ejemplo: "shirt")
-  :param access_token: Token de acceso OAuth2 válido
-  :return: Diccionario con los resultados de la API o None si hay error.
-  """
-  try:
-    # Configurar la conexión HTTPS
-    conn = http.client.HTTPSConnection(HOST, PORT)
-
-    # Configurar headers con el token de acceso
-    headers = {
-      "Authorization": f"Bearer {access_token}",
-      "Content-Type": "application/json"
-    }
-
-    # Hacer la petición con el query
-    endpoint = f"{SEARCH_ENDPOINT}?query={query}"
-    conn.request("GET", endpoint, "", headers)
-
-    # Obtener la respuesta
-    res = conn.getresponse()
-    data = res.read().decode("utf-8")
-
-    # Imprimir detalles para depuración
-    print(f"HTTP Status: {res.status}")
-    print(f"Response: {data}")
-
-    # Convertir la respuesta a diccionario
-    if res.status == 200:
-      return json.loads(data)
-    else:
-      print("Error en la solicitud de productos.")
-      return None
-
-  except Exception as e:
-    print(f"Error en get_products(): {e}")
-    return None
 
 @app.route('/generate_outfit', methods=['POST'])
 def getProducts_multiplePrompts():
     """
-      Genera una lista de productos basada en los outfits generados.
-      ---
-      tags:
-        - Outfits
-      parameters:
-        - name: clothes
-          in: body
-          required: true
+  Genera una lista de productos basada en los outfits generados.
+  ---
+  tags:
+    - Outfits
+  parameters:
+    - name: clothes
+      in: body
+      required: true
+      schema:
+        type: object
+        properties:
+          outfit:
+            type: array
+            items:
+              type: string
+              example: "Camisa de botones blanca"
+  responses:
+    200:
+      description: JSON con los productos recomendados para cada prenda
+      content:
+        application/json:
           schema:
             type: object
-            properties:
-              outfit:
-                type: array
-                items:
-                  type: string
-                  example: "Camisa de botones blanca"
-      responses:
-        200:
-          description: JSON con los productos recomendados para cada prenda
-          content:
-            application/json:
-              schema:
+            additionalProperties:
+              type: array
+              items:
                 type: object
-                additionalProperties:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        example: "Camisa de lino blanca"
-                      price:
-                        type: number
-                        example: 39.99
-                      link:
-                        type: string
-                        example: "https://ejemplo.com/camisa-blanca"
-        400:
-          description: Error en los datos enviados
-        500:
-          description: Error interno del servidor
-      """
-    token = get_token().get("id_token")
+                properties:
+                  name:
+                    type: string
+                    example: "Camisa de lino blanca"
+                  price:
+                    type: number
+                    example: 39.99
+                  link:
+                    type: string
+                    example: "https://ejemplo.com/camisa-blanca"
+    400:
+      description: Error en los datos enviados
+    500:
+      description: Error interno del servidor
+  """
+    token = get_token()
+    if not token:
+        return jsonify({"error": "No se pudo obtener el token"}), 500
 
-    print(token)
-
-    #Generación de una lista de "prompts" a partir de json
     clothes = request.get_json()
     listaPrompts = clothes.get("outfit", [])
-
-    #Generar un json de outfits
-
-    #Declaramos un json vacío
     data = {}
 
     for i in listaPrompts:
-      productos = get_products(i, token)
-      #Añadimos productos a un Yeison, con la i como key (para agruparlos)
-      if productos:
-        # Si la clave ya existe, agregamos los productos sin duplicar
-        if i in data:
-          data[i] = list(set(data[i] + productos))  # Añadir y evitar duplicados
-        else:
-          data[i] = productos  # Primera vez que se añade la clave
-    return data
+        productos = get_products(i, token)
+        if productos:
+            if i in data:
+                data[i] = list(set(data[i] + productos))
+            else:
+                data[i] = productos
+
+    return jsonify(data)
+
 
 if __name__ == '__main__':
-  app.run(debug=True, port=5001)
-
+    app.run(debug=True, port=5002)
