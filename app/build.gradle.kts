@@ -1,15 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    kotlin("plugin.serialization") version "2.1.0"
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "ochat.wearendar"
-    compileSdk = 35
+    compileSdk  = 35
 
     defaultConfig {
         applicationId = "ochat.wearendar"
         minSdk = 26
+        compileSdk = 35
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -30,24 +33,30 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += setOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "META-INF/INDEX.LIST"
+            )
         }
     }
 }
+
+val ktor_version: String by project
+val logback_version: String by project
 
 dependencies {
     implementation(libs.animated.navigation.bar)
@@ -58,6 +67,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.wajahatkarim.flippable)
     implementation(libs.accompanist.pager)
+    implementation(libs.gson)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -76,4 +86,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(kotlin("script-runtime"))
+
+    // kator
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    //implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation(libs.slf4j.simple)
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version") // Para hacer requests de JSON
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version") // Para serializar JSON
 }

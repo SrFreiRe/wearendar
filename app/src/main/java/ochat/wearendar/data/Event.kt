@@ -1,13 +1,14 @@
 package ochat.wearendar.data
 
 import androidx.compose.ui.graphics.Color
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 data class Event(
+    val id: String,
     val title: String,
     val description: String,
-    val startTime: LocalTime,
-    val endTime: LocalTime,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
     val location: String,
     val type: EventType
 )

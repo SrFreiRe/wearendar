@@ -1,40 +1,82 @@
 package ochat.wearendar.backend
+import android.util.Log
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import ochat.wearendar.data.Event
+import ochat.wearendar.data.EventType
+import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-
-/**
- * Esta es la clase principal de la aplicación.
- * Se encarga de la lógica principal.
- */
-class MainActivity : AppCompatActivity() {
-
-    // Propiedades de la clase
-    private var myVariable: String = "Hola Mundo"
-
-    // Comentarios de documentación para la función
-    /**
-     * Esta función se llama cuando se crea la actividad.
-     * @param savedInstanceState Un Bundle que contiene el estado guardado de la actividad.
-     */
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // Aquí va el código de inicialización
-        println(myVariable)
-    }
-
-    // Otras funciones de la clase
-    fun myFuncion() {
-        // Aquí va el código de la función
+val client = HttpClient(CIO) {
+    expectSuccess = true
+    install(ContentNegotiation)
+    install(ContentNegotiation) {
+        json(Json {
+            ignoreUnknownKeys = true
+            prettyPrint = true
+            isLenient = true
+        })
     }
 }
 
-// Funciones fuera de la clase
-fun otraFuncion() {
-    // Aquí va el código de la función
+fun printJson(events: List<EventJson>) {
+    val jsonPretty = Json { prettyPrint = true }.encodeToString(events)
+    println(jsonPretty)
 }
 
-// Punto de entrada principal si se ejecuta como una aplicación independiente
-fun main() {
-    println("Hola desde la función main")
+@Serializable
+data class EventJson(val id:String, val title:String, val startTime:String, val endTime:String, val description:String, val location:String, val type:String)
+
+suspend fun loadCalendarToEventMap(): HashMap<LocalDate, List<Event>> {
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+
+    val events: List<EventJson> = client.get("http://10.0.2.2:5000/events").body()
+    client.close()
+
+    val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME // ✅ Correct format
+
+    val eventMap = events.map { eventCal ->
+        val startDateTime = OffsetDateTime.parse(eventCal.startTime, formatter)
+        val endDateTime = OffsetDateTime.parse(eventCal.endTime, formatter)
+
+        Event(
+            id = eventCal.id,
+            title = eventCal.title,
+            description = eventCal.description,
+            startTime = startDateTime.toLocalDateTime(),
+            endTime = endDateTime.toLocalDateTime(),
+            location = eventCal.location,
+            type = enumValues<EventType>().find { it.name.equals(eventCal.type, ignoreCase = true) } ?: EventType.CASUAL
+        )
+    }.groupBy { it.startTime.toLocalDate() }
+
+    return HashMap(eventMap)
 }
+
+fun printEvents(eventMap: HashMap<LocalDate, List<Event>>) {
+    eventMap.forEach { (date, events) ->
+        println("Date: $date")
+        events.forEach { event ->
+            Log.d("d","  - ${event.title} at ${event.location}, ${event.startTime} → ${event.endTime}")
+        }
+    }
+}
+
+suspend fun main() {
+    val eventMap = loadCalendarToEventMap()
+    printEvents(eventMap)
+
+    printEvents(eventMap)
+}
+

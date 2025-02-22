@@ -67,11 +67,13 @@ class GoogleCalendarManager:
             events = events_result.get('items', [])
             for event in events:
                 all_events.append({
-                    "start": event['start'].get('dateTime', event['start'].get('date')),
-                    "end": event['end'].get('dateTime', event['end'].get('date')),
-                    "summary": event.get("summary", "Sin título"),
+                    "id": event.get("id", "No ID"),
+                    "title": event.get("summary", "Sin título"),
                     "description": event.get("description", ""),
-                    "location": event.get("location", "No especificada")
+                    "startTime": event['start'].get('dateTime', event['start'].get('date')),
+                    "endTime": event['end'].get('dateTime', event['end'].get('date')),
+                    "location": event.get("location", "No especificada"),
+                    "type": event.get("kind", "no type").split("#")[-1]
                 })
         return all_events
 

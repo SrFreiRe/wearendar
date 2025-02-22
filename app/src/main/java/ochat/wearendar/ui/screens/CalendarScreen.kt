@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -72,16 +71,18 @@ import coil.compose.AsyncImage
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import ochat.wearendar.data.Event
 import ochat.wearendar.data.Wear
 import ochat.wearendar.ui.theme.MontserratFontFamily
 import ochat.wearendar.ui.theme.WearendarTheme
-import ochat.wearendar.utils.eventMap
 import ochat.wearendar.utils.formatDate
 import ochat.wearendar.utils.openUrl
 import ochat.wearendar.utils.wearsList
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.Dispatchers
+import ochat.wearendar.backend.loadCalendarToEventMap
 
 
 @Preview
@@ -116,8 +117,21 @@ fun CalendarScreen() {
     }
 }
 
+suspend fun fetchCalendarEvents(): HashMap<LocalDate, List<Event>> {
+    return withContext(Dispatchers.IO) {
+        loadCalendarToEventMap()
+    }
+}
+
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun MonthView(){
+
+    var eventMap by remember { mutableStateOf<HashMap<LocalDate, List<Event>>>(hashMapOf()) }
+
+    LaunchedEffect(Unit) {
+        eventMap = fetchCalendarEvents()
+    }
 
     // PRE CALCULATIONS
     val today = LocalDate.now()
@@ -289,6 +303,7 @@ fun MonthView(){
     }
     
     if (expandedDay != null && clickedPosition != null && monthCardSize != null) {
+
         DayView(
             day = expandedDay!!,
             clickedPosition = clickedPosition!!,
@@ -481,12 +496,14 @@ fun DayView(
 
 @Composable
 fun EventCard(event: Event, alpha: Float, onEventClick: (Int, Offset) -> Unit) {
-    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
     var cardHeight by remember { mutableStateOf(0) }
     var position by remember { mutableStateOf(Offset.Zero) }
 
     val borderWidth = if (alpha == 1f) 1.dp else 0.dp
     val borderColor = if (alpha == 1f) Color.Black else Color.Transparent
+
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     Box(
         modifier = Modifier
@@ -500,7 +517,7 @@ fun EventCard(event: Event, alpha: Float, onEventClick: (Int, Offset) -> Unit) {
                 position = layoutCoordinates.positionInRoot()
             }
             .clickable {
-                val correctedPosition = position.copy(y = position.y - cardHeight) // ✅ Adjust Y position
+                val correctedPosition = position.copy(y = position.y - cardHeight)
                 onEventClick(cardHeight, correctedPosition)
             }
     ) {
