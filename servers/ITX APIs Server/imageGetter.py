@@ -24,7 +24,7 @@ def configure_drivers():
     chrome_options.add_argument("--disable-gpu")  # Deshabilitar la aceleración de hardware
 
     # Ruta de ChromeDriver
-    service = Service('C:/Users/juanf/Downloads/chromedriver-win64/chromedriver.exe')
+    service = Service('C:\\Users\\mateo\\OneDrive\\Escritorio\\chromedriver-win64\\chromedriver.exe')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
@@ -199,5 +199,5 @@ def is_model_image(img_url, tienda):
         return False
 
 
-get_image_url("https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", "bershka")
+# get_image_url("https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", "bershka")
 

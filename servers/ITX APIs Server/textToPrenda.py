@@ -9,6 +9,8 @@ import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
+from imageGetter import get_image_url
+
 TOKEN_FILE = "token.json"
 
 
@@ -198,7 +200,7 @@ def getProducts_multiplePrompts():
                 producto["category"] = category  # Agrega la categoría a cada producto
                 producto["brand"] = productos[0]["brand"]
                 producto["description"] = description
-                producto["photo"] = imageGetter.descargar_imagen_zara(producto["link"], producto["brand"])
+                producto["photo"] = get_image_url(producto["link"], producto["brand"])
 
             # Si la descripción ya está en el diccionario, evita duplicados
             if description in data:
@@ -211,6 +213,7 @@ def getProducts_multiplePrompts():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
+    # app.run(debug=True, port=5002)
     # print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
 
 
