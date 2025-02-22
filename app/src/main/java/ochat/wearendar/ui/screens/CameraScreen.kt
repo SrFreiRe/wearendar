@@ -3,40 +3,25 @@ package ochat.wearendar.ui.screens
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -44,25 +29,33 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import coil.compose.AsyncImage
+import androidx.core.content.ContextCompat
 import ochat.wearendar.ui.theme.MontserratFontFamily
+import java.io.File
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CameraScreen() {
+    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
-    LocalContext.current
+    CameraContent(
+        onPhotoSelected = { uri ->
+            selectedPhotoUri = uri
+        }
+    )
+
+}
+
+@Composable
+fun CameraContent(onPhotoSelected: (Uri) -> Unit) {
     var showCamera by remember { mutableStateOf(false) }
-    var selectedImageUri by remember { mutableStateOf<String?>(null) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { uri -> selectedImageUri = uri?.toString() }
+        onResult = { uri -> uri?.let(onPhotoSelected) }
     )
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,33 +64,31 @@ fun CameraScreen() {
         ) {
             if (showCamera) {
                 CameraView(
-                    onPhotoTaken = { showCamera = false }
+                    onPhotoTaken = { uri ->
+                        showCamera = false
+                        onPhotoSelected(uri)
+                    }
                 )
             } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(
-                        modifier = Modifier
-                            .weight(1f),
+                        modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button(
-                            onClick = {imagePickerLauncher.launch("image/*") },
+                            onClick = { imagePickerLauncher.launch("image/*") },
                             shape = RoundedCornerShape(0.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Black,
                                 contentColor = Color.White
                             ),
-                            modifier = Modifier
-                                .width(180.dp)
-                                .height(60.dp)
+                            modifier = Modifier.width(180.dp).height(60.dp)
                         ) {
                             Text(
-                                text = "Elegir Photo",
+                                text = "Elegir Foto",
                                 fontFamily = MontserratFontFamily,
                                 fontStyle = FontStyle.Normal,
-                                fontSize = 18.sp,
+                                fontSize = 18.sp
                             )
                         }
 
@@ -110,25 +101,13 @@ fun CameraScreen() {
                                 containerColor = Color.Black,
                                 contentColor = Color.White
                             ),
-                            modifier = Modifier
-                                .width(180.dp)
-                                .height(60.dp)
+                            modifier = Modifier.width(180.dp).height(60.dp)
                         ) {
                             Text(
-                                text = "Tomar Photo",
+                                text = "Tomar Foto",
                                 fontFamily = MontserratFontFamily,
                                 fontStyle = FontStyle.Normal,
-                                fontSize = 18.sp,
-                            )
-                        }
-
-                        selectedImageUri?.let {
-                            AsyncImage(
-                                model = it,
-                                contentDescription = "Selected Image",
-                                modifier = Modifier
-                                    .size(200.dp)
-                                    .clip(RoundedCornerShape(16.dp))
+                                fontSize = 18.sp
                             )
                         }
                     }
@@ -139,7 +118,7 @@ fun CameraScreen() {
 }
 
 @Composable
-fun CameraView(onPhotoTaken: () -> Unit) {
+fun CameraView(onPhotoTaken: (Uri) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -178,7 +157,7 @@ fun CameraView(onPhotoTaken: () -> Unit) {
                         imageCaptureConfig
                     )
 
-                    preview.setSurfaceProvider(previewView.surfaceProvider)
+                    preview.surfaceProvider = previewView.surfaceProvider
                     previewView
                 },
                 modifier = Modifier.fillMaxSize()
@@ -195,16 +174,14 @@ fun CameraView(onPhotoTaken: () -> Unit) {
                         .size(80.dp)
                         .background(Color.White, shape = CircleShape)
                         .clickable {
-                            takePhoto(context, imageCapture!!)
-                            onPhotoTaken()
+                            takePhoto(context, imageCapture!!, onPhotoTaken)
                         }
                         .align(Alignment.BottomCenter)
                 )
             }
-
         } else {
             Text(
-                text ="CAMERA PERMISSION REQUIRED",
+                text = "PERMISO DE CÁMARA REQUERIDO",
                 fontFamily = MontserratFontFamily,
                 fontStyle = FontStyle.Normal,
                 fontSize = 20.sp
@@ -213,15 +190,10 @@ fun CameraView(onPhotoTaken: () -> Unit) {
     }
 }
 
-fun takePhoto(context: Context, imageCapture: ImageCapture) {
+fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken: (Uri) -> Unit) {
+    Toast.makeText(context, "Foto tomada", Toast.LENGTH_LONG).show()
 
-    Toast.makeText(context, "Photo taken", Toast.LENGTH_LONG).show()
-
-    /*val photoFile = File(
-        context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-        "photo_${System.currentTimeMillis()}.jpg"
-    )
-
+    val photoFile = File.createTempFile("photo_", ".jpg", context.cacheDir)
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
     imageCapture.takePicture(
@@ -229,12 +201,13 @@ fun takePhoto(context: Context, imageCapture: ImageCapture) {
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                Toast.makeText(context, "Photo saved: ${photoFile.absolutePath}", Toast.LENGTH_LONG).show()
+                val photoUri = Uri.fromFile(photoFile)
+                onPhotoTaken(photoUri)
             }
 
             override fun onError(exception: ImageCaptureException) {
-                Toast.makeText(context, "Failed to save photo: ${exception.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error al guardar la foto: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
         }
-    )*/
+    )
 }
