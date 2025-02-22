@@ -93,16 +93,73 @@ def generate_outfit():
     json_template = json.dumps(
         {
             "outfit": [
-                "Camisa blanca de algodón con cuello clásico y botones frontales.",
-                "Blazer negro de algodón con solapas de pico y un botón.",
-                "Zapatos de cuero marrón oscuro con puntera fina y suela de cuero."
+                {
+                    "description": "Camisa blanca algodón, cuello clásico.",
+                    "category": "Formal"
+                },
+                {
+                    "description": "Camisa azul lino, manga larga.",
+                    "category": "Arreglado"
+                },
+                {
+                    "description": "Pantalón chino beige, corte recto.",
+                    "category": "Casual"
+                },
+                {
+                    "description": "Pantalón negro vestir, bolsillos laterales.",
+                    "category": "Formal"
+                },
+                {
+                    "description": "Blazer gris lana, solapas estrechas.",
+                    "category": "Formal"
+                },
+                {
+                    "description": "Chaqueta negra cuero, cierre cremallera.",
+                    "category": "Casual"
+                },
+                {
+                    "description": "Abrigo largo lana, doble botonadura.",
+                    "category": "Arreglado"
+                },
+                {
+                    "description": "Gabardina beige, cinturón y solapas anchas.",
+                    "category": "Arreglado"
+                },
+                {
+                    "description": "Vestido rojo de lentejuelas, corte entallado y espalda descubierta.",
+                    "category": "Festivo"
+                },
+                {
+                    "description": "Jersey azul lana, cuello alto.",
+                    "category": "Casual"
+                },
+                {
+                    "description": "Sudadera gris algodón, capucha ajustable.",
+                    "category": "Deportivo"
+                },
+                {
+                    "description": "Zapatos Oxford marrón, suela de cuero.",
+                    "category": "Formal"
+                },
+                {
+                    "description": "Deportivas blancas, ajuste cómodo.",
+                    "category": "Deportivo"
+                },
+                {
+                    "description": "Bolso negro piel, asa metálica.",
+                    "category": "Arreglado"
+                },
+                {
+                    "description": "Bufanda gris lana, tacto suave.",
+                    "category": "Casual"
+                }
             ]
         }
     )
 
     prompt = f'''
         **Basado en el siguiente evento, describe un conjunto de prendas ideales con suficiente detalle para ayudar a un motor de búsqueda de moda a encontrar productos similares.**
-        **La descripción debe ser clara y concisa, sin adornos innecesarios, pero manteniendo información relevante sobre el evento.**
+        **La descripción debe ser clara y concisa, con como máximo 6 palabras**
 
         **Detalles del evento:**
         - **Nombre del evento**: {event_summary}
@@ -119,12 +176,17 @@ def generate_outfit():
         6. **Menciona la adecuación climática**: Ideal para verano, invierno, días lluviosos, etc.
         7. **No menciones marcas.**
         8. **Devuelve solo una lista JSON válida con las descripciones de las prendas, sin texto adicional.**
+        9. **Clasifica cada prenda en una de estas categorías según su nivel de formalidad y propósito:**
+               - **Formal**: Prendas para reuniones importantes, eventos de gala o contextos profesionales.
+               - **Arreglado**: Prendas elegantes pero menos estrictas que lo formal, ideales para citas, cenas o trabajo informal.
+               - **Festivo**: Prendas llamativas o especiales para celebraciones y eventos sociales.
+               - **Casual**: Ropa relajada para el día a día o situaciones informales.
+               - **Deportivo**: Prendas diseñadas para actividad física o looks sport.
         9. **No uses tildes ni la letra 'ñ', usa 'n' en su lugar y evita caracteres especiales.**
-        10. **Ten en cuenta que estos textos tienen que ser entendidos por la API de Inditex llamada "product search".**
+        10. **Pon como máximo 4 prendas para el outfit de cada evento.**
 
         **Ejemplo de salida:**
         {json_template}
-        
         '''
 
     try:
@@ -149,16 +211,15 @@ def generate_outfit():
             return jsonify({'error': f'JSON inválido generado por OpenAI: {str(e)}', 'raw_output': outfit_json}), 500
 
         # 🔹 Enviar el resultado al servidor de Inditex para obtener productos
-        #response = requests.post(TEXT_TO_CLOTHES_URL, json={"outfit": outfit_list})
-
+        response = requests.post(TEXT_TO_CLOTHES_URL, json=outfit_list)
         # Para conexión con "textToPrenda"
-        '''if response.status_code == 200:
+        if response.status_code == 200:
             return response.json()  # Devuelve la respuesta de Inditex
         else:
-            return jsonify({'error': 'Error en la consulta a Inditex', 'details': response.text}), 500'''
+            return jsonify({'error': 'Error en la consulta a Inditex', 'details': response.text}), 500
 
         # Para pruebas en local comentar el if de justo arriba
-        return jsonify(outfit_list)
+        #return jsonify(outfit_list)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

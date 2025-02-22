@@ -3,9 +3,6 @@ import base64
 import json
 import time
 import os
-import urllib.parse
-
-import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
@@ -73,34 +70,24 @@ def get_token():
         return None
 
 
-def normalize_text(text):
-    text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('utf-8')
-    return text.replace("ñ", "n")  # Sustituye la ñ manualmente
+import urllib.parse
 
-def get_products(query, access_token, brand="", perPage=5):
+def get_products(query, access_token):
     conn = http.client.HTTPSConnection("api.inditex.com")
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
     }
 
-    query = normalize_text(query)
-
-    query_params = {"query": query}
-    if brand:
-        query_params["brand"] = brand
-
-    query_params["perPage"] = perPage
-
-    encoded_query = urllib.parse.urlencode(query_params)
-    print(encoded_query)
-    endpoint = f"/searchpmpa/products?{encoded_query}"
+    encoded_query = urllib.parse.quote(query)  # Codifica correctamente los caracteres especiales en la URL
+    endpoint = f"/searchpmpa/products?query={encoded_query}"
 
     conn.request("GET", endpoint, headers=headers)
     res = conn.getresponse()
     data = res.read()
 
     return json.loads(data.decode("utf-8"))
+
 
 
 app = Flask(__name__)
@@ -110,54 +97,57 @@ swagger = Swagger(app)
 @app.route('/generate_outfit', methods=['POST'])
 def getProducts_multiplePrompts():
     """
-    Genera una lista de productos basada en los outfits generados.
-    ---
-    tags:
-      - Outfits
-    parameters:
-      - name: clothes
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            outfit:
+  Genera una lista de productos basada en los outfits generados.
+  ---
+  tags:
+    - Outfits
+  parameters:
+    - name: clothes
+      in: body
+      required: true
+      schema:
+        type: object
+        properties:
+          outfit:
+            type: array
+            items:
+              type: string
+              example: "Camisa de botones blanca"
+  responses:
+    200:
+      description: JSON con los productos recomendados para cada prenda
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties:
               type: array
               items:
-                type: string
-                example: "Camisa de botones blanca"
-    responses:
-      200:
-        description: JSON con los productos recomendados para cada prenda
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      example: "Camisa de lino blanca"
-                    price:
-                      type: number
-                      example: 39.99
-                    link:
-                      type: string
-                      example: "https://ejemplo.com/camisa-blanca"
-      400:
-        description: Error en los datos enviados
-      500:
-        description: Error interno del servidor
-    """
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Camisa de lino blanca"
+                  price:
+                    type: number
+                    example: 39.99
+                  link:
+                    type: string
+                    example: "https://ejemplo.com/camisa-blanca"
+    400:
+      description: Error en los datos enviados
+    500:
+      description: Error interno del servidor
+  """
     token = get_token()
     if not token:
         return jsonify({"error": "No se pudo obtener el token"}), 500
 
     clothes = request.get_json()
-    listaPrompts = clothes.get("outfit", [])
+    print (json.dumps(clothes, indent=4))
+
+    # Forma de funcionamiento sin inclusión de categorías
+    '''listaPrompts = clothes.get("outfit", [])
     data = {}
 
     for i in listaPrompts:
@@ -167,11 +157,40 @@ def getProducts_multiplePrompts():
             if i in data:
                 data[i] = list(set(data[i] + productos))
             else:
-                data[i] = productos
+                data[i] = productos'''
+
+    # Funcionamiento con categorías
+    data = {}
+    for item in clothes["outfit"]:
+        category = item["category"]
+        description = item["description"]
+        print(f"Buscando productos para: {description} ({category})")
+
+        query = description + " De estilo " + category + "."
+        print (query)
+        productos = get_products(query, token)
+
+        print(f"Productos ->  {productos}")
+        print(f"Tipo productos ->  + {type(productos)}")
+
+        if productos:
+            if isinstance(productos, dict) and productos.get("title") == "Bad Request":
+                print()
+                print("Error in request to API -> query was too specific")
+                print()
+                continue
+            # Añadir la categoría a cada producto encontrado
+            for producto in productos:
+                producto["category"] = category  # Agrega la categoría a cada producto
+                producto["description"] = description
+            # Si la descripción ya está en el diccionario, evita duplicados
+            if description in data:
+                data[description].extend(productos)
+            else:
+                data[description] = productos  # Primera vez que se añade
 
     return jsonify(data)
 
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
-    # print(get_products("Zapatos azules", get_token(), brand="zara",perPage=5))
