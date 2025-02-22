@@ -144,7 +144,10 @@ def getProducts_multiplePrompts():
         return jsonify({"error": "No se pudo obtener el token"}), 500
 
     clothes = request.get_json()
-    listaPrompts = clothes.get("outfit", [])
+    print (json.dumps(clothes, indent=4))
+
+    # Forma de funcionamiento sin inclusión de categorías
+    '''listaPrompts = clothes.get("outfit", [])
     data = {}
 
     for i in listaPrompts:
@@ -154,7 +157,37 @@ def getProducts_multiplePrompts():
             if i in data:
                 data[i] = list(set(data[i] + productos))
             else:
-                data[i] = productos
+                data[i] = productos'''
+
+    # Funcionamiento con categorías
+    data = {}
+    for item in clothes["outfit"]:
+        category = item["category"]
+        description = item["description"]
+        print(f"Buscando productos para: {description} ({category})")
+
+        query = description + " De estilo " + category + "."
+        print (query)
+        productos = get_products(query, token)
+
+        print(f"Productos ->  {productos}")
+        print(f"Tipo productos ->  + {type(productos)}")
+
+        if productos:
+            if isinstance(productos, dict) and productos.get("title") == "Bad Request":
+                print()
+                print("Error in request to API -> query was too specific")
+                print()
+                continue
+            # Añadir la categoría a cada producto encontrado
+            for producto in productos:
+                producto["category"] = category  # Agrega la categoría a cada producto
+                producto["description"] = description
+            # Si la descripción ya está en el diccionario, evita duplicados
+            if description in data:
+                data[description].extend(productos)
+            else:
+                data[description] = productos  # Primera vez que se añade
 
     return jsonify(data)
 
