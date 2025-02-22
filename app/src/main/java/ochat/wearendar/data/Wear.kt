@@ -9,7 +9,7 @@ data class Wear(
     val url: String,
     val id: Int,
     val brand: Brand,
-    val img: Int,
+    val img: String,
 )
 
 enum class Brand (val drawable: Int){

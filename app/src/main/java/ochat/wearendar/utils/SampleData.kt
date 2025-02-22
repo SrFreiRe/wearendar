@@ -55,50 +55,42 @@ val eventMap = mapOf(
 )
 
 val wears = listOf(
-    Wear("Cazadora cuero", 23.5f, "https://example.com/cazadora", 1, Brand.LEFTIES, R.drawable.p1),
-    Wear("Zapatillas deportivas", 45.0f, "https://example.com/zapatillas", 2, Brand.STRADIVARIUS, R.drawable.p2),
-    Wear("Sudadera con capucha", 30.0f, "https://example.com/sudadera", 3, Brand.OYSHO, R.drawable.p3),
-    Wear("Pantalón vaquero", 28.99f, "https://example.com/vaquero", 4, Brand.ZARA, R.drawable.p4),
-    Wear("Camiseta estampada", 15.5f, "https://example.com/camiseta", 5, Brand.MASSIMO_DUTTI, R.drawable.p5),
-    Wear("Abrigo de lana", 79.99f, "https://example.com/abrigo", 6, Brand.PULL_AND_BEAR, R.drawable.p6),
-    Wear("Cazadora cuero", 23.5f, "https://example.com/cazadora", 7, Brand.LEFTIES, R.drawable.p1),
-    Wear("Zapatillas deportivas", 45.0f, "https://example.com/zapatillas", 8, Brand.STRADIVARIUS, R.drawable.p2),
-    Wear("Sudadera con capucha", 30.0f, "https://example.com/sudadera", 9, Brand.OYSHO, R.drawable.p3),
-    Wear("Pantalón vaquero", 28.99f, "https://example.com/vaquero", 10, Brand.ZARA, R.drawable.p4),
-    Wear("Camiseta estampada", 15.5f, "https://example.com/camiseta", 11, Brand.MASSIMO_DUTTI, R.drawable.p5),
-    Wear("Abrigo de lana", 79.99f, "https://example.com/abrigo", 12, Brand.PULL_AND_BEAR, R.drawable.p6)
+    Wear("Cazadora cuero", 1.00f, "https://www.zara.com/es/es/cazadora-acolchada-lavada-p04575411.html?v1=417748086&v2=2436823", 1, Brand.LEFTIES, "https://static.zara.net/assets/public/930d/e6c9/d8684f02ab5c/675e06873cd8/07484480800-e2/07484480800-e2.jpg?ts=1737018902566&w=344"),
+    Wear("Zapatillas deportivas", 1.05f, "https://www.lefties.com/es/mujer/ropa/vestidos/mono-largo-c1030267514p659642900.html?colorId=712&parentId=660198311", 6, Brand.STRADIVARIUS, "https://static.lefties.com/assets/public/2c23/a986/0d93432b88f0/bfe692ab5159/01062300712-A6/01062300712-A6.jpg?ts=1737716993194&w=300&f=auto"),
+    Wear("Cazadora cuero", 1.10f, "https://www.massimodutti.com/es/chaqueta-denim-cremallera-100-algodon-l02267068?pelement=48639352", 11, Brand.LEFTIES, "https://static.massimodutti.net/assets/public/f044/8f64/621643e2a574/516cb183df02/02267068405-o1/02267068405-o1.jpg?ts=1737994067683"),
+    Wear("Sudadera con capucha", 1.15f, "https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", 16, Brand.OYSHO, "https://static.bershka.net/assets/public/6358/8c94/31a54aa98ec8/a5dc93f63ba1/02210376829-a4o/02210376829-a4o.jpg?ts=1733398296035&w=800"),
 )
 
 val wearsList = listOf(
     listOf(
-        Wear("Cazadora cuero", 1.5f, "https://example.com/cazadora", 1, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 2.5f, "https://example.com/cazadora", 2, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 3.5f, "https://example.com/cazadora", 3, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 4.5f, "https://example.com/cazadora", 4, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 5.5f, "https://example.com/cazadora", 5, Brand.LEFTIES, R.drawable.p1),
-    ),
+        Wear("Cazadora cuero", 1.00f, "https://www.zara.com/es/es/cazadora-acolchada-lavada-p04575411.html?v1=417748086&v2=2436823", 1, Brand.LEFTIES, "https://static.zara.net/assets/public/4c4b/4dfa/f4bd489eb64f/357e4e190eab/01538412030-e1/01538412030-e1.jpg?ts=1740134060108&w=344"),
+        Wear("Cazadora cuero", 1.00f, "https://www.zara.com/es/es/cazadora-acolchada-lavada-p04575411.html?v1=417748086&v2=2436823", 1, Brand.LEFTIES, "https://static.zara.net/assets/public/4c4b/4dfa/f4bd489eb64f/357e4e190eab/01538412030-e1/01538412030-e1.jpg?ts=1740134060108&w=344"),
+        Wear("Cazadora cuero", 1.00f, "https://www.zara.com/es/es/cazadora-acolchada-lavada-p04575411.html?v1=417748086&v2=2436823", 1, Brand.LEFTIES, "https://static.zara.net/assets/public/4c4b/4dfa/f4bd489eb64f/357e4e190eab/01538412030-e1/01538412030-e1.jpg?ts=1740134060108&w=344"),
+        Wear("Cazadora cuero", 1.00f, "https://www.zara.com/es/es/cazadora-acolchada-lavada-p04575411.html?v1=417748086&v2=2436823", 1, Brand.LEFTIES, "https://static.zara.net/assets/public/4c4b/4dfa/f4bd489eb64f/357e4e190eab/01538412030-e1/01538412030-e1.jpg?ts=1740134060108&w=344"),
+        Wear("Cazadora cuero", 1.00f, "https://www.zara.com/es/es/cazadora-acolchada-lavada-p04575411.html?v1=417748086&v2=2436823", 1, Brand.LEFTIES, "https://static.zara.net/assets/public/4c4b/4dfa/f4bd489eb64f/357e4e190eab/01538412030-e1/01538412030-e1.jpg?ts=1740134060108&w=344"),
+       ),
 
     listOf(
-        Wear("Zapatillas deportivas", 45.0f, "https://example.com/zapatillas", 6, Brand.STRADIVARIUS, R.drawable.p2),
-        Wear("Zapatillas deportivas", 46.0f, "https://example.com/zapatillas", 7, Brand.STRADIVARIUS, R.drawable.p2),
-        Wear("Zapatillas deportivas", 47.0f, "https://example.com/zapatillas", 8, Brand.STRADIVARIUS, R.drawable.p2),
-        Wear("Zapatillas deportivas", 48.0f, "https://example.com/zapatillas", 9, Brand.STRADIVARIUS, R.drawable.p2),
-        Wear("Zapatillas deportivas", 49.0f, "https://example.com/zapatillas", 10, Brand.STRADIVARIUS, R.drawable.p2),
-    ),
+        Wear("Zapatillas deportivas", 1.05f, "https://www.lefties.com/es/mujer/ropa/vestidos/mono-largo-c1030267514p659642900.html?colorId=712&parentId=660198311", 6, Brand.STRADIVARIUS, "https://static.lefties.com/assets/public/2c23/a986/0d93432b88f0/bfe692ab5159/01062300712-A6/01062300712-A6.jpg?ts=1737716993194&w=300&f=auto"),
+        Wear("Zapatillas deportivas", 1.06f, "https://www.lefties.com/es/mujer/ropa/vestidos/mono-largo-c1030267514p659642900.html?colorId=712&parentId=660198311", 7, Brand.STRADIVARIUS, "https://static.lefties.com/assets/public/2c23/a986/0d93432b88f0/bfe692ab5159/01062300712-A6/01062300712-A6.jpg?ts=1737716993194&w=300&f=auto"),
+        Wear("Zapatillas deportivas", 1.07f, "https://www.lefties.com/es/mujer/ropa/vestidos/mono-largo-c1030267514p659642900.html?colorId=712&parentId=660198311", 8, Brand.STRADIVARIUS, "https://static.lefties.com/assets/public/2c23/a986/0d93432b88f0/bfe692ab5159/01062300712-A6/01062300712-A6.jpg?ts=1737716993194&w=300&f=auto"),
+        Wear("Zapatillas deportivas", 1.08f, "https://www.lefties.com/es/mujer/ropa/vestidos/mono-largo-c1030267514p659642900.html?colorId=712&parentId=660198311", 9, Brand.STRADIVARIUS, "https://static.lefties.com/assets/public/2c23/a986/0d93432b88f0/bfe692ab5159/01062300712-A6/01062300712-A6.jpg?ts=1737716993194&w=300&f=auto"),
+        Wear("Zapatillas deportivas", 1.09f, "https://www.lefties.com/es/mujer/ropa/vestidos/mono-largo-c1030267514p659642900.html?colorId=712&parentId=660198311", 10, Brand.STRADIVARIUS, "https://static.lefties.com/assets/public/2c23/a986/0d93432b88f0/bfe692ab5159/01062300712-A6/01062300712-A6.jpg?ts=1737716993194&w=300&f=auto"),
+        ),
 
     listOf(
-        Wear("Cazadora cuero", 23.5f, "https://example.com/cazadora", 11, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 33.5f, "https://example.com/cazadora", 12, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 43.5f, "https://example.com/cazadora", 13, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 53.5f, "https://example.com/cazadora", 14, Brand.LEFTIES, R.drawable.p1),
-        Wear("Cazadora cuero", 63.5f, "https://example.com/cazadora", 15, Brand.LEFTIES, R.drawable.p1),
-    ),
+        Wear("Cazadora cuero", 1.10f, "https://www.massimodutti.com/es/chaqueta-denim-cremallera-100-algodon-l02267068?pelement=48639352", 11, Brand.ZARA, "https://static.massimodutti.net/assets/public/f044/8f64/621643e2a574/516cb183df02/02267068405-o1/02267068405-o1.jpg?ts=1737994067683"),
+        Wear("Cazadora cuero", 1.11f, "https://www.massimodutti.com/es/chaqueta-denim-cremallera-100-algodon-l02267068?pelement=48639352", 12, Brand.ZARA, "https://static.massimodutti.net/assets/public/f044/8f64/621643e2a574/516cb183df02/02267068405-o1/02267068405-o1.jpg?ts=1737994067683"),
+        Wear("Cazadora cuero", 1.12f, "https://www.massimodutti.com/es/chaqueta-denim-cremallera-100-algodon-l02267068?pelement=48639352", 13, Brand.ZARA, "https://static.massimodutti.net/assets/public/f044/8f64/621643e2a574/516cb183df02/02267068405-o1/02267068405-o1.jpg?ts=1737994067683"),
+        Wear("Cazadora cuero", 1.13f, "https://www.massimodutti.com/es/chaqueta-denim-cremallera-100-algodon-l02267068?pelement=48639352", 14, Brand.ZARA, "https://static.massimodutti.net/assets/public/f044/8f64/621643e2a574/516cb183df02/02267068405-o1/02267068405-o1.jpg?ts=1737994067683"),
+        Wear("Cazadora cuero", 1.14f, "https://www.massimodutti.com/es/chaqueta-denim-cremallera-100-algodon-l02267068?pelement=48639352", 15, Brand.ZARA, "https://static.massimodutti.net/assets/public/f044/8f64/621643e2a574/516cb183df02/02267068405-o1/02267068405-o1.jpg?ts=1737994067683"),
+        ),
 
     listOf(
-        Wear("Sudadera con capucha", 31.0f, "https://example.com/sudadera", 16, Brand.OYSHO, R.drawable.p3),
-        Wear("Sudadera con capucha", 32.0f, "https://example.com/sudadera", 17, Brand.OYSHO, R.drawable.p3),
-        Wear("Sudadera con capucha", 33.0f, "https://example.com/sudadera", 18, Brand.OYSHO, R.drawable.p3),
-        Wear("Sudadera con capucha", 34.0f, "https://example.com/sudadera", 19, Brand.OYSHO, R.drawable.p3),
-        Wear("Sudadera con capucha", 35.0f, "https://example.com/sudadera", 20, Brand.OYSHO, R.drawable.p3),
+        Wear("Sudadera con capucha", 1.15f, "https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", 16, Brand.OYSHO, "https://static.bershka.net/assets/public/6358/8c94/31a54aa98ec8/a5dc93f63ba1/02210376829-a4o/02210376829-a4o.jpg?ts=1733398296035&w=800"),
+        Wear("Sudadera con capucha", 1.16f, "https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", 17, Brand.OYSHO, "https://static.bershka.net/assets/public/6358/8c94/31a54aa98ec8/a5dc93f63ba1/02210376829-a4o/02210376829-a4o.jpg?ts=1733398296035&w=800"),
+        Wear("Sudadera con capucha", 1.17f, "https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", 18, Brand.OYSHO, "https://static.bershka.net/assets/public/6358/8c94/31a54aa98ec8/a5dc93f63ba1/02210376829-a4o/02210376829-a4o.jpg?ts=1733398296035&w=800"),
+        Wear("Sudadera con capucha", 1.18f, "https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", 19, Brand.OYSHO, "https://static.bershka.net/assets/public/6358/8c94/31a54aa98ec8/a5dc93f63ba1/02210376829-a4o/02210376829-a4o.jpg?ts=1733398296035&w=800"),
+        Wear("Sudadera con capucha", 1.19f, "https://www.bershka.com/es/jersey-cropped-c0p172274332.html?colorId=829", 20, Brand.OYSHO, "https://static.bershka.net/assets/public/6358/8c94/31a54aa98ec8/a5dc93f63ba1/02210376829-a4o/02210376829-a4o.jpg?ts=1733398296035&w=800"),
     )
 )

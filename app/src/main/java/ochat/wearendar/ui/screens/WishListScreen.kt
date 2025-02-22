@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,14 +38,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import ochat.wearendar.data.Wear
 import ochat.wearendar.ui.theme.MontserratFontFamily
 import ochat.wearendar.ui.theme.WearendarTheme
+import ochat.wearendar.utils.openUrl
 import ochat.wearendar.utils.wears
 
 @Preview
@@ -136,18 +140,22 @@ fun WishListView() {
 
 @Composable
 fun WishListItem(wear: Wear, onRemove: () -> Unit, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp)
             .height(86.dp)
-            .border(1.dp, Color.Black),
+            .border(1.dp, Color.Black)
+            .clickable{ openUrl(context = context, wear.url)},
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier
                 .weight(0.5f)
                 .padding(8.dp)
+
         ) {
             Text(
                 text = wear.name,
@@ -178,8 +186,8 @@ fun WishListItem(wear: Wear, onRemove: () -> Unit, modifier: Modifier = Modifier
 
             )
 
-            Image(
-                painter = painterResource(id = wear.img),
+            AsyncImage(
+                model = wear.img,
                 contentDescription = "Product Image",
                 modifier = Modifier
                     .fillMaxHeight()

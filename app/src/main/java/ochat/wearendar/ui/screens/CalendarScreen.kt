@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -67,6 +68,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
 import kotlinx.coroutines.delay
@@ -76,6 +78,7 @@ import ochat.wearendar.ui.theme.MontserratFontFamily
 import ochat.wearendar.ui.theme.WearendarTheme
 import ochat.wearendar.utils.eventMap
 import ochat.wearendar.utils.formatDate
+import ochat.wearendar.utils.openUrl
 import ochat.wearendar.utils.wearsList
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -550,6 +553,7 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
     var isClosing by remember { mutableStateOf(false) }
     var isExpanded by remember { mutableStateOf(false) }
     val flipController =  rememberFlipController()
+    var isFlipped by remember { mutableStateOf(false) }
 
     // OFFSET CALCULATIONS
     val density = LocalDensity.current
@@ -605,7 +609,9 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable { isFlipped = !isFlipped }
+        ,
     ) {
         Box(
             modifier = Modifier
@@ -630,6 +636,9 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
                         slideOutVertically(targetOffsetY = { it / 4 }, animationSpec = tween(200))
             ) {
 
+                // LLAMADA
+                val wearsList = wearsList
+
                 Flippable(
                     frontSide = {
                         Box(
@@ -646,12 +655,13 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
                                 .fillMaxSize()
                                 .border(1.dp, Color.Black)
                         ) {
-                            BackSideContent(onBack = { isClosing = true }, wearsList)
+                            BackSideContent(onBack = { isClosing = true }, wearsList, isFlipped = isFlipped)
                         }
                     },
                     flipController = flipController,
                     flipDurationMs = 300,
                     cameraDistance = 200f,
+                    onFlippedListener = { isFlipped = !isFlipped }
                 )
             }
         }
@@ -712,7 +722,8 @@ fun FrontSideContent(event: Event){
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
+fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>, isFlipped: Boolean) {
+
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -743,7 +754,7 @@ fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
                         .fillMaxHeight()
                         .weight(1f)
                 ) { page ->
-                    WearItemView(wear = wears[0][page])
+                    WearItemView(wear = wears[0][page], isFlipped)
                 }
 
                 VerticalPager(
@@ -752,7 +763,9 @@ fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
                         .fillMaxHeight()
                         .weight(1f)
                 ) { page ->
-                    WearItemView(wear = wears[1][page])
+                    WearItemView(
+                        wear = wears[1][page], isFlipped = isFlipped
+                    )
                 }
             }
 
@@ -772,7 +785,7 @@ fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
                         .fillMaxHeight()
                         .weight(1f)
                 ) { page ->
-                    WearItemView(wear = wears[2][page])
+                    WearItemView(wear = wears[2][page], isFlipped)
                 }
 
                 VerticalPager(
@@ -781,7 +794,7 @@ fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
                         .fillMaxHeight()
                         .weight(1f)
                 ) { page ->
-                    WearItemView(wear = wears[3][page])
+                    WearItemView(wear = wears[3][page], isFlipped)
                 }
             }
         }
@@ -839,16 +852,19 @@ fun BackSideContent(onBack: () -> Unit, wears: List<List<Wear>>) {
 }
 
 @Composable
-fun WearItemView(wear: Wear, modifier: Modifier = Modifier) {
+fun WearItemView(wear: Wear, isFlipped: Boolean, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .then(if (isFlipped) Modifier.clickable { openUrl(context, wear.url) } else Modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = wear.img),
+        AsyncImage(
+            model = wear.img,
             contentDescription = wear.name,
             modifier = Modifier
                 .weight(0.8f)
