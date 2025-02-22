@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,9 +31,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +52,6 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
@@ -61,7 +60,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import ochat.wearendar.data.Event
 import ochat.wearendar.ui.theme.MontserratFontFamily
-import ochat.wearendar.ui.theme.Typography
 import ochat.wearendar.ui.theme.WearendarTheme
 import ochat.wearendar.utils.eventMap
 import ochat.wearendar.utils.formatDate
@@ -301,7 +299,12 @@ fun DayView(
     var isExpanded by remember { mutableStateOf(false) }
     var showContent by remember { mutableStateOf(false) }
 
-    // OFFSET CALCULATIONS
+    var selectedEvent by rememberSaveable { mutableStateOf<Event?>(null) }
+    var eventCardHeight by remember { mutableStateOf(0) }
+
+    val eventPositions = remember { mutableStateMapOf<Event, Offset>() }
+
+        // OFFSET CALCULATIONS
     val density = LocalDensity.current
     val columnSpacing = 8.dp
     val columnSpacingPx = with(density) { columnSpacing.toPx() }
@@ -395,7 +398,8 @@ fun DayView(
                 .clickable {
                     isClosing = true
                 }
-                .background(Color.Black),
+                .background(Color.White)
+                .border(1.dp, Color.Black),
         ) {
 
             AnimatedVisibility(
@@ -418,31 +422,64 @@ fun DayView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp, start = 16.dp, bottom = 8.dp),
-                        color = Color.White
+                        color = Color.Black
                     )
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(events) { event ->
-                            EventCard(event)
+                            EventCard(event, onEventClick = { height, coordinates ->
+                                Log.d("DayView", "Selected Event: ${event.description}, Position: $coordinates")
+                                selectedEvent = event
+                                eventCardHeight = height
+                                eventPositions[event] = coordinates
+                            })
                         }
                     }
                 }
             }
         }
+        selectedEvent?.let { event ->
+
+            val monthSizeXPx = with(density) { monthSizeX.toPx().toInt() }
+            val monthSizeYPx = with(density) { (monthSizeY - 32.dp).toPx().toInt() }
+            val daySize = IntSize(monthSizeXPx, monthSizeYPx)
+
+            val eventClickedPosition = eventPositions[event] ?: Offset.Zero
+
+            EventView(
+                event = event,
+                clickedPosition = eventClickedPosition,
+                daySize = daySize,
+                eventHeight = eventCardHeight,
+                onDismiss = { selectedEvent = null }
+            )
+        }
     }
 }
 
 @Composable
-fun EventCard(event: Event) {
+fun EventCard(event: Event, onEventClick: (Int, Offset) -> Unit) {
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    var cardHeight by remember { mutableStateOf(0) }
+    var position by remember { mutableStateOf(Offset.Zero) }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .background(Color.White),
+            .background(Color.White)
+            .border(1.dp, Color.Black)
+            .onGloballyPositioned { layoutCoordinates ->
+                cardHeight = layoutCoordinates.size.height
+                position = layoutCoordinates.positionInRoot()
+            }
+            .clickable {
+                val correctedPosition = position.copy(y = position.y - cardHeight) // ✅ Adjust Y position
+                Log.d("EventCard", "Clicked Event: ${event.description}, Position: $correctedPosition")
+                onEventClick(cardHeight, correctedPosition)
+            }
     ) {
         Row(
             modifier = Modifier
@@ -451,15 +488,12 @@ fun EventCard(event: Event) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
                     .size(20.dp)
                     .background(event.type.color),
-            ) {
-            }
+            )
 
-            // Event description on the left
             Text(
                 text = event.description.uppercase(),
                 fontFamily = MontserratFontFamily,
@@ -469,10 +503,7 @@ fun EventCard(event: Event) {
                 color = Color.Black
             )
 
-            // Time range on the right in a column
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
+            Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = event.startTime.format(timeFormatter),
                     fontFamily = MontserratFontFamily,
@@ -487,6 +518,133 @@ fun EventCard(event: Event) {
                     fontSize = 16.sp,
                     color = Color.Black
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeight: Int, onDismiss: () -> Unit) {
+    var moveToCenterStarted by remember { mutableStateOf(false) }
+    var sizeAnimationStarted by remember { mutableStateOf(false) }
+    var isClosing by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
+    var showContent by remember { mutableStateOf(false) }
+
+    // OFFSET CALCULATIONS
+    val density = LocalDensity.current
+
+
+    val initialHeightDp = with(density) { eventHeight.toDp() }
+
+    val initialYOffsetDp = with(density) { clickedPosition.y.toDp() }
+
+    val dayWidth = with(density) { daySize.width.toDp() }
+    val dayHeight = with(density) { daySize.height.toDp() }
+
+    val centerY = with(density) { (dayHeight / 2) - (initialHeightDp / 2) }
+
+    // ANIMATIONS
+    val offsetY by animateDpAsState(
+        targetValue = if (moveToCenterStarted) centerY else initialYOffsetDp,
+        animationSpec = tween(durationMillis = 0, easing = FastOutSlowInEasing),
+        label = "OffsetY"
+    )
+
+    val height by animateDpAsState(
+        targetValue = if (sizeAnimationStarted) dayHeight else initialHeightDp,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+        label = "HeightAnimation"
+    )
+
+    val adjustedOffsetY by animateDpAsState(
+        targetValue = if (sizeAnimationStarted) 0.dp else offsetY,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+        label = "AdjustedOffsetY"
+    )
+
+    LaunchedEffect(Unit) {
+        moveToCenterStarted = true
+        delay(300)
+        sizeAnimationStarted = true
+        delay(300)
+        isExpanded = true
+    }
+
+    LaunchedEffect(isClosing) {
+        if (isClosing) {
+            showContent = false
+            isExpanded = false
+            sizeAnimationStarted = false
+            delay(300)
+            moveToCenterStarted = false
+            delay(300)
+            onDismiss()
+        }
+    }
+
+    // COMPOSE
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.TopStart
+    ) {
+        Box(
+            modifier = Modifier
+                .offset(y = adjustedOffsetY)
+                .size(
+                    width =  dayWidth,
+                    if (!isExpanded) height else dayHeight - 32.dp
+                )
+                .graphicsLayer(scaleX = 1f, scaleY = 1f, shape = RoundedCornerShape(16.dp))
+                .clickable {
+                    isClosing = true
+                }
+                .background(Color.White)
+                .border(1.dp, Color.Black),
+        ) {
+            AnimatedVisibility(
+                visible = showContent,
+                enter = fadeIn(animationSpec = tween(200)) +
+                        slideInVertically(initialOffsetY = { it / 4 }, animationSpec = tween(200)),
+                exit = fadeOut(animationSpec = tween(200)) +
+                        slideOutVertically(targetOffsetY = { it / 4 }, animationSpec = tween(200))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = event.description.uppercase(),
+                        fontFamily = MontserratFontFamily,
+                        fontStyle = FontStyle.Normal,
+                        fontSize = 22.sp,
+                        color = Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Start Time: ${event.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                        fontSize = 18.sp,
+                        color = Color.Black
+                    )
+
+                    Text(
+                        text = "End Time: ${event.endTime.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                        fontSize = 18.sp,
+                        color = Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(onClick = { isClosing = true }) {
+                        Text("Close")
+                    }
+                }
             }
         }
     }
