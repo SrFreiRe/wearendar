@@ -6,10 +6,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import requests
-import cv2
 import numpy as np
 from io import BytesIO
 from PIL import Image
+import cv2
 
 
 # Configuración de Selenium
@@ -21,7 +21,7 @@ def configure_drivers():
     chrome_options.add_argument("--disable-gpu")  # Deshabilitar la aceleración de hardware
 
     # Ruta de ChromeDriver
-    service = Service('C:/Users/juanf/Downloads/chromedriver-win64/chromedriver.exe')
+    service = Service('"C:\\Users\\mateo\\OneDrive\\Escritorio\\chromedriver-win64\\chromedriver.exe"')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
@@ -140,8 +140,6 @@ def get_image_url(url_producto, tienda):
     except Exception as e:
         print("Ocurrió un error:", e)
         return None
-    finally:
-        driver.quit()
 
 
 def is_model_image(img_url, white_threshold=240, percentage_threshold=50, top_fraction=0.3):

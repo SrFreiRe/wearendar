@@ -198,7 +198,7 @@ def getProducts_multiplePrompts():
                 producto["category"] = category  # Agrega la categoría a cada producto
                 producto["brand"] = productos[0]["brand"]
                 producto["description"] = description
-                producto["photo"] = imageGetter.descargar_imagen_zara(producto["link"], producto["brand"])
+                producto["photo"] = imageGetter.get_image_url(producto["link"], producto["brand"])
 
             # Si la descripción ya está en el diccionario, evita duplicados
             if description in data:
