@@ -3,10 +3,14 @@ import base64
 import json
 import time
 import os
+import urllib.parse
+
+import unicodedata
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 
-TOKEN_FILE = "token.json"
+TOKEN_FILE = "../../microservicios/token.json"
+
 
 def get_token():
     """Obtiene un token de acceso desde Inditex OAuth2 API y lo almacena en un archivo local con un timestamp."""
@@ -70,17 +74,19 @@ def get_token():
         return None
 
 
-import urllib.parse
 
-def get_products(query, access_token):
+def get_products(query, access_token, brand="", perPage=5):
     conn = http.client.HTTPSConnection("api.inditex.com")
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
     }
 
-    encoded_query = urllib.parse.quote(query)  # Codifica correctamente los caracteres especiales en la URL
-    endpoint = f"/searchpmpa/products?query={encoded_query}"
+    query_params = {"image": query}
+
+    encoded_query = urllib.parse.urlencode(query_params)
+    # print(encoded_query)
+    endpoint = f"/pubvsearch/products?{encoded_query}"
 
     conn.request("GET", endpoint, headers=headers)
     res = conn.getresponse()
@@ -89,74 +95,67 @@ def get_products(query, access_token):
     return json.loads(data.decode("utf-8"))
 
 
-
 app = Flask(__name__)
 swagger = Swagger(app)
 
 
-@app.route('/generate_outfit', methods=['POST'])
-def getProducts_multiplePrompts():
+@app.route('/copy_outfit', methods=['POST'])
+def prendasDeImagen():
     """
-  Genera una lista de productos basada en los outfits generados.
-  ---
-  tags:
-    - Outfits
-  parameters:
-    - name: clothes
-      in: body
-      required: true
-      schema:
-        type: object
-        properties:
-          outfit:
-            type: array
-            items:
-              type: string
-              example: "Camisa de botones blanca"
-  responses:
-    200:
-      description: JSON con los productos recomendados para cada prenda
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties:
+    Genera una lista de productos basada en los outfits generados.
+    ---
+    tags:
+      - URL
+    parameters:
+      - name: clothes
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            URL:
               type: array
               items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "Camisa de lino blanca"
-                  price:
-                    type: number
-                    example: 39.99
-                  link:
-                    type: string
-                    example: "https://ejemplo.com/camisa-blanca"
-    400:
-      description: Error en los datos enviados
-    500:
-      description: Error interno del servidor
-  """
+                type: string
+                example: "Camisa de botones blanca"
+    responses:
+      200:
+        description: JSON con los productos recomendados para cada prenda
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "Camisa de lino blanca"
+                    price:
+                      type: number
+                      example: 39.99
+                    link:
+                      type: string
+                      example: "https://ejemplo.com/camisa-blanca"
+      400:
+        description: Error en los datos enviados
+      500:
+        description: Error interno del servidor
+    """
     token = get_token()
     if not token:
         return jsonify({"error": "No se pudo obtener el token"}), 500
 
     clothes = request.get_json()
-    listaPrompts = clothes.get("outfit", [])
-    data = {}
+    print(clothes)
+    URLImagen = clothes.get("URL")
+    print(URLImagen)
 
-    for i in listaPrompts:
-        print(i)
-        productos = get_products(i, token)
-        if productos:
-            if i in data:
-                data[i] = list(set(data[i] + productos))
-            else:
-                data[i] = productos
+    productos = get_products(URLImagen[00], token)
 
-    return jsonify(data)
+    return jsonify(productos)
 
 
 if __name__ == '__main__':
