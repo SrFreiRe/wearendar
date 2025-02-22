@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="62fd5dca-e39f-4861-abb5-07f4ca30b68e" name="Changes" comment="Foto a prendas en producción">
+    <list default="true" id="62fd5dca-e39f-4861-abb5-07f4ca30b68e" name="Changes" comment="Codigo traducido al inglés">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/wearendar.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wearendar.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/servers/outfitApi/imageGetter.py" beforeDir="false" afterPath="$PROJECT_DIR$/servers/outfitApi/imageGetter.py" afterDir="false" />
     </list>
@@ -39,18 +41,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "SrFreiRe"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;SrFreiRe&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/SrFreiRe/wearendar.git",
-    "accountId": "04bde350-fea9-46c2-a6a3-2a2ce30722b6"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/SrFreiRe/wearendar.git&quot;,
+    &quot;accountId&quot;: &quot;04bde350-fea9-46c2-a6a3-2a2ce30722b6&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -59,26 +61,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Postman3.executor": "Run",
-    "Python.fotoToPrenda.executor": "Run",
-    "Python.postman.executor": "Run",
-    "Python.postman2.executor": "Run",
-    "Python.textToPrenda.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/mateo/OneDrive/Escritorio/mateo/GrEI/ArqCom/P2/wearendar/servers/ITX APIs Server",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Postman3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.fotoToPrenda.executor&quot;: &quot;Run&quot;,
+    &quot;Python.imageGetter.executor&quot;: &quot;Run&quot;,
+    &quot;Python.postman.executor&quot;: &quot;Run&quot;,
+    &quot;Python.postman2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.textToPrenda.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/mateo/OneDrive/Escritorio/mateo/GrEI/ArqCom/P2/wearendar/servers/ITX APIs Server&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\mateo\OneDrive\Escritorio\mateo\GrEI\ArqCom\P2\wearendar\servers\ITX APIs Server" />
@@ -137,7 +140,7 @@
       <workItem from="1740193199856" duration="36000" />
       <workItem from="1740193270496" duration="21161000" />
       <workItem from="1740222859978" duration="950000" />
-      <workItem from="1740230889415" duration="1480000" />
+      <workItem from="1740230889415" duration="2508000" />
     </task>
     <task id="LOCAL-00001" summary="Conexión con la API de InditexTech a través de las funciones de textToPrenda.py&#10;&#10;Siguente:&#10;Exportar como servidor en flask.">
       <option name="closed" value="true" />
@@ -251,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740225018732</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Codigo traducido al inglés">
+      <option name="closed" value="true" />
+      <created>1740233199137</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1740233199137</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -277,14 +288,15 @@
     <MESSAGE value="Cambio completo a producción.&#10;&#10;Siguente: &#10;cambiar para generar un token solo cuando el anterior está expirado." />
     <MESSAGE value="Merge" />
     <MESSAGE value="Foto a prendas en producción" />
-    <option name="LAST_COMMIT_MESSAGE" value="Foto a prendas en producción" />
+    <MESSAGE value="Codigo traducido al inglés" />
+    <option name="LAST_COMMIT_MESSAGE" value="Codigo traducido al inglés" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/wearendar$Postman3.coverage" NAME="Postman3 Coverage Results" MODIFIED="1740206217695" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
     <SUITE FILE_PATH="coverage/wearendarGit$Json_eventToOutfit.coverage" NAME="Json_eventToOutfit Coverage Results" MODIFIED="1740218605972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/outfitApi" />
     <SUITE FILE_PATH="coverage/wearendar$postman.coverage" NAME="postman Coverage Results" MODIFIED="1740206581421" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
-    <SUITE FILE_PATH="coverage/wearendarGit$imageGetter.coverage" NAME="imageGetter Coverage Results" MODIFIED="1740213548626" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/outfitApi" />
-    <SUITE FILE_PATH="coverage/wearendarGit$textToPrenda.coverage" NAME="textToPrenda Coverage Results" MODIFIED="1740218655085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
+    <SUITE FILE_PATH="coverage/wearendarGit$imageGetter.coverage" NAME="imageGetter Coverage Results" MODIFIED="1740233656872" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/outfitApi" />
+    <SUITE FILE_PATH="coverage/wearendarGit$textToPrenda.coverage" NAME="textToPrenda Coverage Results" MODIFIED="1740233414139" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
     <SUITE FILE_PATH="coverage/wearendar$postman2.coverage" NAME="postman2 Coverage Results" MODIFIED="1740201760056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />
     <SUITE FILE_PATH="coverage/wearendar$fotoToPrenda.coverage" NAME="fotoToPrenda Coverage Results" MODIFIED="1740222490792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/servers/ITX APIs Server" />
     <SUITE FILE_PATH="coverage/wearendar$textToPrenda.coverage" NAME="textToPrenda Coverage Results" MODIFIED="1740223659590" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/microservicios" />

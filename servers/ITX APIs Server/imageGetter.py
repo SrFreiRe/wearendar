@@ -6,6 +6,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import requests
+import cv2
+import numpy as np
+from io import BytesIO
+from PIL import Image
 
 
 # Configuración de Selenium
@@ -140,6 +144,36 @@ def get_image_url(url_producto, tienda):
         driver.quit()
 
 
+def is_model_image(img_url, white_threshold=240, percentage_threshold=50, top_fraction=0.3):
+    try:
+        # Descargar la imagen desde la URL
+        response = requests.get(img_url)
+        response.raise_for_status()
+        img_array = np.array(Image.open(BytesIO(response.content)))
+
+        # Convertir a escala de grises
+        gray_img = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+
+        # Determinar la región superior a analizar
+        height = gray_img.shape[0]
+        top_height = int(height * top_fraction)
+        top_region = gray_img[:top_height, :]
+
+        # Contar píxeles "blancos" (o muy claros)
+        white_pixels = np.sum(top_region > white_threshold)
+        total_pixels = top_region.size
+        white_percentage = (white_pixels / total_pixels) * 100
+
+        print(f"Porcentaje de píxeles blancos en la parte superior: {white_percentage:.2f}%")
+
+        return white_percentage > percentage_threshold
+
+    except Exception as e:
+        print(f"Error al procesar la imagen: {e}")
+        return None
+
 # Ejemplo de uso
 url_producto = "https://www.lefties.com/es/mujer/novedades/jeans-culotte-el%C3%A1stico-c1030267503p659622175.html?colorId=428&parentId=659626182#fromrecommendation"
+img_url= get_image_url(url_producto, 'lefties')
+is_model = is_model_image(img_url)
 print(f"URL de la imagen: {get_image_url(url_producto, 'lefties')}")
