@@ -13,9 +13,9 @@ def get_token():
   # Configuración de OAuth2
   HOST = "auth.inditex.com"
   PORT = 443
-  TOKEN_ENDPOINT = "/openam/oauth2/itxid/itxidmp/sandbox/access_token"
-  CLIENT_ID = "oauth-mkpsbox-oauthyabmuqumslafcelioysnbxpro"
-  CLIENT_SECRET = "D8}2U0{6_e@s}w-."
+  TOKEN_ENDPOINT = "/openam/oauth2/itxid/itxidmp/access_token"
+  CLIENT_ID = "oauth-mkplace-oauthbgpcpiyyxjbigjylsbpropro"
+  CLIENT_SECRET = "EiV8_qt5a8-93._p"
   SCOPE = "technology.catalog.read"
 
   try:
@@ -64,7 +64,7 @@ def get_products(query, access_token):
   """Realiza una petición GET a la API de Inditex para buscar productos."""
   HOST = "api-sandbox.inditex.com"
   PORT = 443
-  SEARCH_ENDPOINT = "/searchpmpa-sandbox/products"
+  SEARCH_ENDPOINT = "/searchpmpa/products"
   """
   Realiza una petición GET a la API de Inditex para buscar productos.
 
@@ -175,5 +175,5 @@ def getProducts_multiplePrompts():
     return data
 
 if __name__ == '__main__':
-  app.run(debug=True, port=5001)
+  app.run(debug=True, port=5002)
 
