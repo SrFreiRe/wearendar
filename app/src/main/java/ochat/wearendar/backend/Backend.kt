@@ -6,10 +6,20 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.io.IOException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import ochat.wearendar.data.Event
 import ochat.wearendar.data.EventType
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.Response
+import java.io.File
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -71,6 +81,36 @@ fun printEvents(eventMap: HashMap<LocalDate, List<Event>>) {
             Log.d("d","  - ${event.title} at ${event.location}, ${event.startTime} → ${event.endTime}")
         }
     }
+}
+
+fun uploadImageToImgBB(imageFile: File, callback: (String?) -> Unit) {
+    val API_KEY = "ac0b6c9898da425be7a51079961d3e07"
+
+    val client = OkHttpClient()
+    val requestBody = MultipartBody.Builder()
+        .setType(MultipartBody.FORM)
+        .addFormDataPart("key", "ac0b6c9898da425be7a51079961d3e07")
+        .addFormDataPart("image", imageFile.name, RequestBody.create("image/*".toMediaType(), imageFile))
+        .build()
+
+    val request = Request.Builder()
+        .url("https://api.imgbb.com/1/upload")
+        .post(requestBody)
+        .build()
+
+    client.newCall(request).enqueue(object : Callback {
+        override fun onFailure(call: Call, e: IOException) {
+            callback(null)
+        }
+
+        override fun onResponse(call: Call, response: Response) {
+            response.body?.string()?.let { json ->
+                val url = Regex("\"url\":\"(.*?)\"").find(json)?.groups?.get(1)?.value
+                print(url)
+                callback(url)
+            }
+        }
+    })
 }
 
 suspend fun main() {

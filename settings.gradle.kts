@@ -12,7 +12,7 @@ pluginManagement {
     }
     plugins {
         id("org.jetbrains.kotlin.android") version "2.1.0"
-        id("com.android.application") version "8.6.0"
+        id("com.android.application") version "8.8.1"
         id("org.jetbrains.compose") version "2.1.0"
     }
 }

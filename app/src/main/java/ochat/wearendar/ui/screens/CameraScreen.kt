@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,29 +31,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toFile
+import ochat.wearendar.backend.uploadImageToImgBB
 import ochat.wearendar.ui.theme.MontserratFontFamily
 import java.io.File
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CameraScreen() {
-    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedPhotoFile by remember { mutableStateOf<File?>(null) }
 
     CameraContent(
-        onPhotoSelected = { uri ->
-            selectedPhotoUri = uri
+        onPhotoSelected = { file ->
+            selectedPhotoFile = file
+            uploadImageToImgBB(file) { url ->
+                Log.d("ULR", url!!)
+            }
         }
     )
-
 }
 
 @Composable
-fun CameraContent(onPhotoSelected: (Uri) -> Unit) {
+fun CameraContent(onPhotoSelected: (File) -> Unit) {
     var showCamera by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { uri -> uri?.let(onPhotoSelected) }
+        onResult = { uri ->
+            uri?.let { onPhotoSelected(uriToFile(context, it)) }
+        }
     )
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -64,9 +72,9 @@ fun CameraContent(onPhotoSelected: (Uri) -> Unit) {
         ) {
             if (showCamera) {
                 CameraView(
-                    onPhotoTaken = { uri ->
+                    onPhotoTaken = { file ->
                         showCamera = false
-                        onPhotoSelected(uri)
+                        onPhotoSelected(file)
                     }
                 )
             } else {
@@ -118,7 +126,7 @@ fun CameraContent(onPhotoSelected: (Uri) -> Unit) {
 }
 
 @Composable
-fun CameraView(onPhotoTaken: (Uri) -> Unit) {
+fun CameraView(onPhotoTaken: (File) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -190,7 +198,7 @@ fun CameraView(onPhotoTaken: (Uri) -> Unit) {
     }
 }
 
-fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken: (Uri) -> Unit) {
+fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken: (File) -> Unit) {
     Toast.makeText(context, "Foto tomada", Toast.LENGTH_LONG).show()
 
     val photoFile = File.createTempFile("photo_", ".jpg", context.cacheDir)
@@ -201,8 +209,7 @@ fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken: (Uri) 
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                val photoUri = Uri.fromFile(photoFile)
-                onPhotoTaken(photoUri)
+                onPhotoTaken(photoFile)
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -210,4 +217,15 @@ fun takePhoto(context: Context, imageCapture: ImageCapture, onPhotoTaken: (Uri) 
             }
         }
     )
+}
+
+fun uriToFile(context: Context, uri: Uri): File {
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val tempFile = File.createTempFile("selected_", ".jpg", context.cacheDir)
+    inputStream?.use { input ->
+        tempFile.outputStream().use { output ->
+            input.copyTo(output)
+        }
+    }
+    return tempFile
 }

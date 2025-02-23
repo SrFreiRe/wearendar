@@ -24,7 +24,7 @@ def configure_drivers():
     chrome_options.add_argument("--disable-gpu")  # Deshabilitar la aceleración de hardware
 
     # Ruta de ChromeDriver
-    service = Service('C:\\Users\\mateo\\OneDrive\\Escritorio\\chromedriver-win64\\chromedriver.exe')
+    service = Service('/Users/ppazosp/Downloads/chromedriver-mac-arm64/chromedriver')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
@@ -146,6 +146,7 @@ def get_image_url(url_producto, tienda):
         best_url = lowest_skin_percentage(img_element,tienda)
         print(f"Mejor URL encontrada: {best_url}")
         # Descargar la imagen desde la URL
+        driver.quit()
         return best_url
 
     except Exception as e:
@@ -159,7 +160,7 @@ def lowest_skin_percentage(img_urls,tienda):
     # Iterar sobre las URLs de las imágenes
     for img_url in img_urls:
         skin_percentage = is_model_image(img_url,tienda)
-        if skin_percentage + 2 < result_skin:
+        if skin_percentage + 0.5 < result_skin:
             result_skin = skin_percentage
             result_url = img_url
     return result_url
@@ -182,7 +183,7 @@ def is_model_image(img_url, tienda):
         hsv_img = cv2.cvtColor(img_array, cv2.COLOR_RGB2HSV)
 
         # Definir rango de colores de piel en HSV
-        lower_skin = np.array([0, 40, 50], dtype=np.uint8)  # Rango bajo
+        lower_skin = np.array([10, 40, 50], dtype=np.uint8)  # Rango bajo
         upper_skin = np.array([35, 255, 255], dtype=np.uint8)  # Rango alto
         skin_mask = cv2.inRange(hsv_img, lower_skin, upper_skin)
 
