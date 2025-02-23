@@ -24,7 +24,7 @@ def configure_drivers():
     chrome_options.add_argument("--disable-gpu")  # Deshabilitar la aceleración de hardware
 
     # Ruta de ChromeDriver
-    service = Service('/Users/ppazosp/Downloads/chromedriver-mac-arm64/chromedriver')
+    service = Service('"C:\\Users\\juanf\\Downloads\\chromedriver-win64\\chromedriver.exe"')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
