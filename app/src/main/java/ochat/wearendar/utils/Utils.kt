@@ -11,7 +11,9 @@ fun LocalDate.formatDate(): String {
     return this.format(DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault()))
 }
 
-fun openUrl(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    context.startActivity(intent)
+fun openUrl(context: Context, url: String?) {
+    if (url != null) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
+    }
 }

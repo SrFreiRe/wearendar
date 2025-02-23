@@ -84,6 +84,8 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers
 import ochat.wearendar.backend.jsonCalendarToPrendas
 import ochat.wearendar.backend.loadCalendarToEventMap
+import ochat.wearendar.utils.eventMap
+import ochat.wearendar.utils.wearsList
 
 
 @Preview
@@ -128,11 +130,11 @@ suspend fun fetchCalendarEvents(): HashMap<LocalDate, List<Event>> {
 @Composable
 fun MonthView(){
 
-    var eventMap by remember { mutableStateOf<HashMap<LocalDate, List<Event>>>(hashMapOf()) }
+    //var eventMap by remember { mutableStateOf<HashMap<LocalDate, List<Event>>>(hashMapOf()) }
 
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         eventMap = fetchCalendarEvents()
-    }
+    }*/
 
     // PRE CALCULATIONS
     val today = LocalDate.now()
@@ -581,35 +583,25 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
     var isExpanded by remember { mutableStateOf(false) }
     val flipController = rememberFlipController()
     var isFlipped by remember { mutableStateOf(false) }
-    var wearsListState by remember { mutableStateOf<List<List<Wear>>?>(null) }
 
-    var finished = false
+    //var wearsListState by remember { mutableStateOf<List<List<Wear>>?>(null) }
+    //var isLoading by remember { mutableStateOf(true) }
 
+    /*
+    // Fetch wears list asynchronously
     LaunchedEffect(event) {
-        Log.d("abc", "defg")
         wearsListState = fetchWears(event)
-        finished = true
+        isLoading = false
     }
-
-    while (!finished) {
-    }
-
-    val wearsList = wearsListState!!
-
+    */
 
     // OFFSET CALCULATIONS
     val density = LocalDensity.current
-
-
     val initialHeightDp = with(density) { eventHeight.toDp() }
-
     val initialYOffsetDp = with(density) { clickedPosition.y.toDp() }
-
     val dayWidth = with(density) { daySize.width.toDp() }
     val dayHeight = with(density) { daySize.height.toDp() }
-
     val centerY = with(density) { (dayHeight / 2) - (initialHeightDp / 2) }
-
 
     // ANIMATIONS
     val offsetY by animateDpAsState(
@@ -648,7 +640,9 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
             onDismiss()
         }
     }
+
     val borderColor = if (isExpanded) Color.Transparent else Color.Black
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -663,9 +657,7 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
                     if (!isExpanded) height else dayHeight - 32.dp
                 )
                 .graphicsLayer(scaleX = 1f, scaleY = 1f, shape = RoundedCornerShape(16.dp))
-                .clickable {
-                    isClosing = true
-                }
+                .clickable { isClosing = true }
                 .border(1.dp, borderColor)
                 .background(Color.White)
                 .alpha(1f),
@@ -676,42 +668,57 @@ fun EventView(event: Event, clickedPosition: Offset, daySize: IntSize, eventHeig
                         slideInVertically(initialOffsetY = { it / 4 }, animationSpec = tween(200)),
                 exit = fadeOut(animationSpec = tween(200)) +
                         slideOutVertically(targetOffsetY = { it / 4 }, animationSpec = tween(200))
-            ) {
+            ) {}
 
-
-            }
-
-            Flippable(
-                frontSide = {
+            /*if (isLoading) {
+                // Mostrar indicador de carga mientras se obtiene la info
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {*/
+               // wearsListState?.let { wearsList ->
+                    Flippable(
+                        frontSide = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .border(1.dp, Color.Black)
+                            ) {
+                                FrontSideContent(event)
+                            }
+                        },
+                        backSide = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .border(1.dp, Color.Black)
+                            ) {
+                                BackSideContent(
+                                    onBack = { isClosing = true },
+                                    wearsList = wearsList,
+                                    isFlipped
+                                )
+                            }
+                        },
+                        flipController = flipController,
+                        flipDurationMs = 300,
+                        cameraDistance = 200f,
+                        onFlippedListener = { isFlipped = !isFlipped }
+                    )
+                    //) ?: run {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .border(1.dp, Color.Black)
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        FrontSideContent(event)
-                    }
-                },
-                backSide = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .border(1.dp, Color.Black)
-                    ) {
-                        BackSideContent(
-                            onBack = { isClosing = true },
-                            wearsList = wearsList,
-                            isFlipped
-                        )
-                    }
-                },
-                flipController = flipController,
-                flipDurationMs = 300,
-                cameraDistance = 200f,
-                onFlippedListener = { isFlipped = !isFlipped }
-            )
+                        //Text(text = "No se pudo cargar la información", color = Color.Red)
+                        }
         }
     }
 }
+
 
 suspend fun fetchWears(event: Event): List<List<Wear>> {
     return withContext(Dispatchers.IO) {

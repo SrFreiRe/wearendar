@@ -16,6 +16,7 @@ TOKEN_FILE = "token.json"
 
 
 def get_token():
+    print("HEMOS LLEGADO A GET TOKEN")
     """Obtiene un token de acceso desde Inditex OAuth2 API y lo almacena en un archivo local con un timestamp."""
 
     # Si el archivo de token existe, verificamos si el token sigue siendo válido
@@ -155,6 +156,8 @@ def getProducts_multiplePrompts():
     500:
       description: Error interno del servidor
   """
+
+    print("HEMOS LLEGADO A GET PRODUCTS MULTIPLE PROMPTS")
     # Token de API Inditex
     token = get_token()
     if not token:
@@ -184,7 +187,7 @@ def getProducts_multiplePrompts():
         category = item["category"]
         description = item["description"]
         query = description + " De estilo " + category + "."
-        productos = get_products(query, token, perPage=5)
+        productos = get_products(query, token, perPage=1)
 
         print(f"Productos ->  {productos}")
         print(f"Tipo productos ->  + {type(productos)}")

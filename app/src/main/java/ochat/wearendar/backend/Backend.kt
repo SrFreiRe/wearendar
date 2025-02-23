@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -15,6 +16,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.io.IOException
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.float
@@ -37,8 +39,22 @@ import java.io.File
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.floatOrNull
 
 val client = HttpClient(CIO) {
+    install(HttpTimeout) {
+        requestTimeoutMillis = 300_000 // 5 minutos
+        connectTimeoutMillis = 300_000
+        socketTimeoutMillis = 300_000
+    }
     expectSuccess = true
     install(ContentNegotiation)
     install(ContentNegotiation) {
@@ -61,7 +77,6 @@ data class EventJson(val id:String, val title:String, val startTime:String, val 
 suspend fun loadCalendarToEventMap(): HashMap<LocalDate, List<Event>> {
 
     val events: List<EventJson> = client.get("http://10.0.2.2:5000/events").body()
-    client.close()
 
     val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME // ✅ Correct format
 
@@ -112,12 +127,36 @@ fun eventListToJsonCalendar(event: Event): String {
         "type" to "event"
     )
 
-    return gson.toJson(eventJson)
+    return gson.toJson(listOf(eventJson))
 }
 
 fun extractWearLists(jsonString: String): List<List<Wear>> {
-    val wearMap: Map<String, List<Wear>> = Json.decodeFromString(jsonString)
+    val jsonParser = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+        isLenient = true
+    }
+    val wearMap: Map<String, List<Wear>> = jsonParser.decodeFromString(jsonString)
     return wearMap.values.toList()
+}
+
+object PriceAsFloatSerializer : KSerializer<Float> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("price", PrimitiveKind.FLOAT)
+
+    override fun serialize(encoder: Encoder, value: Float) {
+        encoder.encodeFloat(value)
+    }
+
+    override fun deserialize(decoder: Decoder): Float {
+        val jsonElement = decoder.decodeSerializableValue(JsonElement.serializer())
+
+        // Extraer el valor `current` dentro de `price.value`
+        return jsonElement.jsonObject["value"]
+            ?.jsonObject?.get("current")
+            ?.jsonPrimitive?.floatOrNull
+            ?: throw IllegalArgumentException("No se encontró el valor 'current' en el objeto price")
+    }
 }
 
 
@@ -127,10 +166,11 @@ suspend fun jsonCalendarToPrendas(event: Event): List<List<Wear>> {
     val json = eventListToJsonCalendar(event);
 
     try {
-        val response: String = client.post("http://10.0.2.2:5001/generate_outfit"){
+        val response: String = client.post("http://10.0.2.2:5001/generate_outfit") {
             contentType(ContentType.Application.Json)
             setBody(json)
         }.body()
+
 
         // Convertir JSON en listas de prendas
         val wearLists: List<List<Wear>> = extractWearLists(response)
@@ -146,7 +186,7 @@ suspend fun jsonCalendarToPrendas(event: Event): List<List<Wear>> {
         return wearLists
 
     } finally {
-        client.close()
+//        client.close()
     }
 }
 

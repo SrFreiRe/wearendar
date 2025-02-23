@@ -43,21 +43,27 @@ def generate_outfit():
           items:
             type: object
             properties:
+              id:
+                type: string
+                example: "123456"
+              title:
+                type: string
+                example: "Reunión con el jefe"
               description:
                 type: string
                 example: ""
-              end:
+              endTime:
                 type: string
                 example: "2025-02-23"
               location:
                 type: string
                 example: "No especificada"
-              start:
+              startTime:
                 type: string
                 example: "2025-02-22"
-              summary:
+              type:
                 type: string
-                example: "Reunión con el jefe de producción"
+                example: "event"  
     responses:
       200:
         description: Lista de prendas generada correctamente
@@ -75,6 +81,7 @@ def generate_outfit():
       500:
         description: Error interno del servidor
     """
+    print("HEMOS LLEGADO A GENFIT")
     event_data = request.get_json()
     if not event_data:
         return jsonify({'error': 'No se proporcionó información del evento.'}), 400
